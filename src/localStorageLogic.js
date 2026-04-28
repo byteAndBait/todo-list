@@ -5,13 +5,13 @@ export const saveToLocal = () => {
     localStorage.setItem("projects", JSON.stringify(Projects))
 }
 
-export const clearLocal = () => {
+export const _clearLocal = () => {
     localStorage.clear("projects")
 }
 export const getFromLocal = () => {
     let ready = false;
     if (localStorage.getItem("projects") == undefined) {
-        saveToLocal()
+        localStorage.setItem("projects", JSON.stringify({}))
         return JSON.parse(localStorage.getItem("projects"))
     } else {
         let localProjects = JSON.parse(localStorage.getItem("projects"))
