@@ -1,3 +1,5 @@
 {
+  "typescript.suggest.autoImports": false,
+  "javascript.suggest.autoImports": false,
   "liveServer.settings.port": 5501
 }

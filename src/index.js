@@ -1,6 +1,5 @@
-import "./css/main.css"
-import "./css/normalize.css"
-import { clearLocal, createTodo, EditATodo, viewATodo, removeATodo, createProject, removeProject, viewAProject, viewAllProjects } from "./todoList.js"
+import { setupUI } from "./UI/ui.js"
+import { clearLocal, createTodo, EditATodo, viewATodo, removeATodo, createProject, removeProject, viewAProject, viewAllProjects } from "./coreLogic/todoList.js"
 
 const myTodoDetails = {
     title: "Programming",
@@ -11,7 +10,9 @@ const myTodoDetails = {
 const myOtherTodoDetails = {
     title: "Math Lecture",
     description: "Pretty Fascinating",
-    priority: "High"
+    priority: "High",
+    dueDate: new Date(2022, 4, 30),
+    completed: true
 }
 
 const dumbData = () => {
@@ -20,8 +21,7 @@ const dumbData = () => {
     createTodo(myOtherTodoDetails, "Studying")
 
     EditATodo("default", myTodoDetails.title, "description", "It's actually pretty challenging")
-    console.log(viewATodo("default", myTodoDetails.title))
-    console.log(viewATodo("Studying", myOtherTodoDetails.title))
 
-    removeATodo("Studying", myOtherTodoDetails.title)
 }
+    EditATodo("default", myTodoDetails.title, "description", "It's actually not pretty challenging")
+

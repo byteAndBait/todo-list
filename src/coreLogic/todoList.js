@@ -18,9 +18,10 @@ class Todo {
         this.title = details.title
         this.description = details.description
         this.priority = details.priority
+        this.completed = details.completed || false
         if (details.dueDate instanceof Date) {
             if ((compareAsc(details.dueDate, new Date())) === 1) {
-                this.dueDate = format(details.dueDate, "dd/MM/yyyy")
+                this.dueDate = format(details.dueDate, "yyyy-MM-dd")
             }
         }
     }
@@ -74,12 +75,13 @@ const EditATodo = (projectName, todoTitle, dataName, modification) => {
 
         return "Please Re-Check Your arguments"
     }
-    if (_getATodo() == undefined) {
+    if (_getATodo(projectName, todoTitle) == undefined) {
         return "Your Todo Doesn't Exist!"
     }
 
     const currentTodo = _getATodo(projectName, todoTitle)
     currentTodo.edit(dataName, modification)
+    console.log()
     saveToLocal()
 }
 
