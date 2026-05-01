@@ -23,5 +23,4 @@ const dumbData = () => {
     EditATodo("default", myTodoDetails.title, "description", "It's actually pretty challenging")
 
 }
-    EditATodo("default", myTodoDetails.title, "description", "It's actually not pretty challenging")
-
+setupUI()

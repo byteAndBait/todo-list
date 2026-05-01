@@ -9,16 +9,52 @@
 </head>
 
 <body>
+
     <nav class="sideBar">
         <div class="logo">
             todoleast
         </div>
         <div class="projectsList">
-            
+
         </div>
     </nav>
     <main class="content">
     </main>
+
+    <button id="createTodoButton">+</button>
+    <dialog id="createTodoDialog">
+        <button class="closeButton">x</button>
+        <form>
+            <p>
+                <label for="titleOfTodo">The Title of your todo</label>
+                <input type="text" id="titleOfTodo" name="titleOfTodo" required>
+            </p>
+            <p>
+                <label for="descriptionOfTodo">The description of your todo</label>
+                <textarea id="descriptionOfTodo" name="descriptionOfTodo"></textarea>
+            </p>
+            <p>
+                <label for="dueDateOfTodo">Due Date:</label>
+                <input type="date" id="dueDateOfTodo" name="dueDateOfTodo">
+            </p>
+            <p>
+                <label for="prioritySelectMenu">Priority:</label>
+                <select name="prioritySelectMenu" id="prioritySelectMenu">
+                    <option value="Low">Low</option>
+                    <option value="Medium">Medium</option>
+                    <option value="High">High</option>
+                    <option value="none" selected>none</option>
+                </select>
+            </p>
+            <p>
+                <label for="projectsSelectMenu">Project:</label>
+                <select name="projectsSelectMenu" id="projectsSelectMenu">
+                </select>
+            </p>
+
+            <input type="submit" value="Create Your Todo">
+        </form>
+    </dialog>
 </body>
 
 </html>

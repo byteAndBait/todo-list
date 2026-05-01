@@ -1,6 +1,5 @@
 import { todoEdit, projectAddTodo, projectRemoveTodo } from "./compositors.js"
 import { getFromLocal, saveToLocal, _clearLocal } from "./localStorageLogic.js"
-import { format, compareAsc } from "date-fns";
 
 const syncLocal = () => {
     Projects = getFromLocal()
@@ -10,7 +9,7 @@ const clearLocal = () => {
     syncLocal()
     createProject("default")
 }
-let Projects = {}
+export let Projects = {}
 
 
 class Todo {
@@ -19,11 +18,7 @@ class Todo {
         this.description = details.description
         this.priority = details.priority
         this.completed = details.completed || false
-        if (details.dueDate instanceof Date) {
-            if ((compareAsc(details.dueDate, new Date())) === 1) {
-                this.dueDate = format(details.dueDate, "yyyy-MM-dd")
-            }
-        }
+        this.dueDate = details.dueDate
     }
 }
 class Project {
@@ -62,6 +57,9 @@ const createTodo = (details, projectName) => {
     if (Projects[projectName] == undefined) {
         return "Your Project Doesn't exist"
     }
+    if (Projects[projectName].todos[details.title]) {
+        return "Your Todo Does Exist!"
+    }
     const todoToBeCreated = new Todo(details)
     Projects[projectName].addTodo(
         Object.assign(todoToBeCreated, todoEdit(todoToBeCreated)
@@ -81,7 +79,6 @@ const EditATodo = (projectName, todoTitle, dataName, modification) => {
 
     const currentTodo = _getATodo(projectName, todoTitle)
     currentTodo.edit(dataName, modification)
-    console.log()
     saveToLocal()
 }
 
@@ -135,4 +132,4 @@ const viewAllProjects = () => {
 }
 
 
-export { Projects, clearLocal, createTodo, createProject, EditATodo, viewATodo, removeATodo, viewAProject, viewAllProjects, removeProject }
+export { clearLocal, createTodo, createProject, EditATodo, viewATodo, removeATodo, viewAProject, viewAllProjects, removeProject }
