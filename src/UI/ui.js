@@ -165,6 +165,7 @@ function createProjectButtonHandler() {
         if (input.value) {
             createProject(input.value)
             input.value = ""
+            Projects = viewAllProjects()
             createTodoDialogPopulator()
             updateScreen()
         }

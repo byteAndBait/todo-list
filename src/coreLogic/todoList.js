@@ -2,7 +2,7 @@ import { todoEdit, projectAddTodo, projectRemoveTodo } from "./compositors.js"
 import { getFromLocal, saveToLocal, _clearLocal } from "./localStorageLogic.js"
 
 const syncLocal = () => {
-    Projects = getFromLocal()
+    Projects = getFromLocal(Projects)
 }
 const clearLocal = () => {
     _clearLocal()
@@ -42,12 +42,12 @@ const createProject = (name) => {
         projectAddTodo(projectToBeCreated),
         projectRemoveTodo(projectToBeCreated)
     )
-    saveToLocal()
+    saveToLocal(Projects)
 }
 const removeProject = (name) => {
     syncLocal()
     delete Projects[name]
-    saveToLocal()
+    saveToLocal(Projects)
 }
 createProject("default")
 
@@ -64,7 +64,7 @@ const createTodo = (details, projectName) => {
     Projects[projectName].addTodo(
         Object.assign(todoToBeCreated, todoEdit(todoToBeCreated)
         ))
-    saveToLocal()
+    saveToLocal(Projects)
 }
 
 const EditATodo = (projectName, todoTitle, dataName, modification) => {
@@ -79,13 +79,13 @@ const EditATodo = (projectName, todoTitle, dataName, modification) => {
 
     const currentTodo = _getATodo(projectName, todoTitle)
     currentTodo.edit(dataName, modification)
-    saveToLocal()
+    saveToLocal(Projects)
 }
 
 const removeATodo = (projectName, todoTitle) => {
     syncLocal()
     Projects[projectName].removeTodo(todoTitle)
-    saveToLocal()
+    saveToLocal(Projects)
 }
 
 

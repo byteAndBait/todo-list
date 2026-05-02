@@ -1,7 +1,6 @@
-import { Projects } from "./todoList.js"
 import { todoEdit, projectAddTodo, projectRemoveTodo } from "./compositors.js"
 
-export const saveToLocal = () => {
+export const saveToLocal = (Projects) => {
     localStorage.setItem("projects", JSON.stringify(Projects))
 }
 
@@ -9,7 +8,6 @@ export const _clearLocal = () => {
     localStorage.clear("projects")
 }
 export const getFromLocal = () => {
-    let ready = false;
     if (localStorage.getItem("projects") == undefined) {
         localStorage.setItem("projects", JSON.stringify({}))
         return JSON.parse(localStorage.getItem("projects"))
@@ -31,6 +29,6 @@ export const getFromLocal = () => {
                 )
             }
         }
-        return Object.assign(Projects, localProjects)
+        return localProjects
     }
 }
