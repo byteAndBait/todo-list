@@ -1,3 +1,5 @@
+/* Global */
+
 * {
   margin: 0;
   padding: 0;
@@ -7,20 +9,17 @@
 body {
   height: 100vh;
   height: 100dvh;
-  font-family:
-    system-ui,
-    -apple-system,
-    BlinkMacSystemFont,
-    "Segoe UI",
-    Roboto,
-    Oxygen,
-    Ubuntu,
-    Cantarell,
-    "Open Sans",
-    "Helvetica Neue",
-    sans-serif;
+  font-family: monospace;
 
   display: flex;
+}
+
+button {
+  color: white;
+  background-color: black;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
 }
 
 /* createTodoDialog */
@@ -28,16 +27,9 @@ body {
   position: absolute;
   top: 10px;
   right: 10px;
+  font-size: 1.75rem;
   width: 40px;
   height: 40px;
-  color: white;
-  background-color: black;
-  border: none;
-  border-radius: 5px;
-  font-size: 1.75rem;
-  display: grid;
-  place-items: center;
-  cursor: pointer;
 }
 #createTodoDialog {
   width: 30rem;
@@ -72,37 +64,76 @@ nav.sideBar {
   flex: 0.5;
   background-color: white;
   border-right: 1px solid rgb(222, 222, 222);
+  padding: 10px;
   .logo {
     font-size: 2rem;
     font-weight: bolder;
   }
+  position: relative;
 }
 
 nav.sideBar .projectsList {
   display: grid;
-  padding: 10px;
   gap: 1rem;
+  margin: 10px 0;
 }
-nav.sideBar .projectButton {
-  appearance: none;
-  border: none;
+nav.sideBar .projectTile {
   background-color: white;
-  padding: 10px 20px;
+  width: 100%;
   text-align: left;
   font-size: 1.2rem;
   border: solid 1px rgb(192, 192, 192);
   border-radius: 5px;
   cursor: pointer;
   transition: 300ms ease;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   &:hover {
     box-shadow: rgba(0, 0, 0, 0.15) 1.95px 1.95px 2.6px;
   }
 }
-nav.sideBar .projectsList .projectButton.active {
+.projectTile .projectName{
+  padding:10px;
+  flex: 5;
+}
+nav.sideBar .projectTile:hover .removeProjectButton{
+  opacity: 1;
+}
+nav.sideBar .projectTile .removeProjectButton {
+  opacity: 0;
+  display: block;
+  transition: 300ms ease;
+  background-color: transparent;
+  color: grey;
+  flex:1;
+  height: 100%;
+}
+nav.sideBar .projectsList .projectTile.active {
   background-color: black;
   color: white;
 }
 
+nav.sideBar .createProjectButton {
+  width: 30px;
+  height: 30px;
+  font-size: 1.5rem;
+}
+
+nav.sideBar .createProjectInput {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+nav.sideBar .createProjectInput input {
+  height: 25px;
+  border: none;
+  width: 95%;
+  border-bottom: solid 1px rgb(121, 121, 121);
+}
+
+/* Main Content Styling */
 main.content {
   flex: 2;
   background-color: white;

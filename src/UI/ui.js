@@ -5,7 +5,7 @@ import { format } from "date-fns"
 const projectsList = document.querySelector("nav.sideBar .projectsList")
 const mainContentElement = document.querySelector("main.content")
 const createTodoDialog = document.querySelector("#createTodoDialog")
-
+const createProjectInput = document.querySelector(".createProjectInput")
 let Projects = viewAllProjects()
 
 function updateProjectsList() {
@@ -19,39 +19,54 @@ function updateProjectsList() {
 
     for (let i in projectNames) {
         const projectName = projectNames[i]
-        projectsList.appendChild(createProjectButton(projectName))
+
+        const projectTileElement = createProjectTile(projectName)
+        projectsList.appendChild(projectTileElement)
     }
 
 
 
 
-    function createProjectButton(projectName) {
-        const projectButton = document.createElement("button")
-        projectButton.classList.add("projectButton")
-        projectButton.dataset.projectName = projectName
-        projectButton.textContent = projectName
-        return projectButton
+    function createProjectTile(projectName) {
+        const projectTile = document.createElement("div")
+        projectTile.classList.add("projectTile")
+        projectTile.dataset.projectName = projectName
+
+        const projectNameElement = document.createElement("div")
+        projectNameElement.classList.add("projectName")
+        projectNameElement.textContent = projectName
+
+        const removeButton = document.createElement("button")
+        removeButton.textContent = "x"
+        removeButton.classList.add("removeProjectButton")
+
+        projectTile.append(projectNameElement, removeButton)
+        return projectTile
     }
 }
 export function setupUI() {
     updateScreen()
-    document.querySelector(".projectButton").click() // Show Default Project Content
+    document.querySelector(".projectTile").click() // Show Default Project Content
     createTodoDialogPopulator()
     createTodoDialogHandler()
-
     createTodoButtonHandler()
+    createProjectButtonHandler()
 
 }
 function updateScreen() {
     updateProjectsList()
     projectsList.addEventListener("click", (e) => {
-        if (e.target.classList.contains("projectButton")) {
-            showContentOfAProject(e.target.dataset.projectName)
+        if (e.target.classList.contains("projectName")) {
+            showContentOfAProject(e.target.parentElement.dataset.projectName)
 
             projectsList.childNodes.forEach((child) => {
                 child.classList.remove("active")
             })
-            e.target.classList.toggle("active")
+            e.target.parentElement.classList.toggle("active")
+        }
+        if(e.target.classList.contains("removeProjectButton")){
+            removeProject(e.target.parentElement.dataset.projectName)
+            updateScreen()
         }
     })
 }
@@ -105,6 +120,7 @@ function createTodoButtonHandler() {
 
 function createTodoDialogPopulator() {
     const projectsSelectMenu = createTodoDialog.querySelector("#projectsSelectMenu")
+    projectsSelectMenu.textContent = ""
     for (let i in Projects) {
         const project = Projects[i]
         projectsSelectMenu.appendChild(addOption(project.name))
@@ -140,4 +156,18 @@ function createTodoDialogHandler() {
         createTodoDialog.close()
         updateScreen()
     })
+}
+
+function createProjectButtonHandler() {
+    const button = createProjectInput.querySelector("button")
+    const input = createProjectInput.querySelector("input")
+    button.addEventListener("click", () => {
+        if (input.value) {
+            createProject(input.value)
+            input.value = ""
+            createTodoDialogPopulator()
+            updateScreen()
+        }
+    })
+
 }
