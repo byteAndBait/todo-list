@@ -7,22 +7,13 @@ const mainContentElement = document.querySelector("main.content")
 const createTodoDialog = document.querySelector("#createTodoDialog")
 const createProjectInput = document.querySelector(".createProjectInput")
 
-class ProjectManager{
-    static #Projects = viewAllProjects()
-    static getProjects = function(){
-        return this.#Projects
-    }
-    static sync = function(){
-        this.#Projects = viewAllProjects()
-    }
-}
-console.log(ProjectManager.getProjects())
+let Projects = viewAllProjects()
 
 function updateProjectsList() {
     projectsList.textContent = ''
     const projectNames = [];
-    ProjectManager.sync()
-    let Projects = ProjectManager.getProjects()
+    Projects = viewAllProjects()
+
     for (let i in Projects) {
         const project = Projects[i]
         projectNames.push(project.name)
@@ -48,11 +39,11 @@ function updateProjectsList() {
         projectNameElement.textContent = projectName
         projectTile.appendChild(projectNameElement)
 
-        if(!(projectName === "default")){
-        const removeButton = document.createElement("button")
-        removeButton.textContent = "x"
-        removeButton.classList.add("removeProjectButton")
-        projectTile.appendChild( removeButton)
+        if (!(projectName === "default")) {
+            const removeButton = document.createElement("button")
+            removeButton.textContent = "x"
+            removeButton.classList.add("removeProjectButton")
+            projectTile.appendChild(removeButton)
 
         }
 
@@ -79,28 +70,29 @@ function updateScreen() {
             })
             e.target.parentElement.classList.toggle("active")
         }
-        if(e.target.classList.contains("removeProjectButton")){
+        if (e.target.classList.contains("removeProjectButton")) {
             removeProject(e.target.parentElement.dataset.projectName)
+            createTodoDialogPopulator()
             updateScreen()
         }
     })
 
-    mainContentElement.addEventListener("click",(e)=>{
+    mainContentElement.addEventListener("click", (e) => {
         const element = e.target
-        if(element.classList.contains("todoCompletion")){
-            if(element.checked){
-                EditATodo(element.parentElement.dataset.projectName,element.parentElement.dataset.todoTitle , "completed" , true)
+        if (element.classList.contains("todoCompletion")) {
+            if (element.checked) {
+                EditATodo(element.parentElement.dataset.projectName, element.parentElement.dataset.todoTitle, "completed", true)
                 element.parentElement.classList.add("todoCompleted")
-            }else if (element.checked === false){
-                EditATodo(element.parentElement.dataset.projectName,element.parentElement.dataset.todoTitle , "completed" , false)
+            } else if (element.checked === false) {
+                EditATodo(element.parentElement.dataset.projectName, element.parentElement.dataset.todoTitle, "completed", false)
                 element.parentElement.classList.remove("todoCompleted")
             }
         }
     })
 }
 function showContentOfAProject(projectName) {
-    ProjectManager.sync()
-    let Projects = ProjectManager.getProjects()
+    Projects = viewAllProjects()
+
     mainContentElement.textContent = ""
     const todos = Projects[projectName].todos
 
@@ -138,11 +130,11 @@ function showContentOfAProject(projectName) {
         const todoCompletion = document.createElement("input")
         todoCompletion.classList.add("todoCompletion")
         todoCompletion.type = "checkbox"
-        if(todo.completed){
+        if (todo.completed) {
             todoElement.classList.add("todoCompleted")
             todoCompletion.checked = true
         };
-            todoElement.append(todoPriority, todoCompletion)
+        todoElement.append(todoPriority, todoCompletion)
         return todoElement
     }
 }
@@ -156,8 +148,8 @@ function createTodoButtonHandler() {
 function createTodoDialogPopulator() {
     const projectsSelectMenu = createTodoDialog.querySelector("#projectsSelectMenu")
     projectsSelectMenu.textContent = ""
-        ProjectManager.sync()
-    let Projects = ProjectManager.getProjects()
+    Projects = viewAllProjects()
+
     for (let i in Projects) {
         const project = Projects[i]
         projectsSelectMenu.appendChild(addOption(project.name))
@@ -191,6 +183,7 @@ function createTodoDialogHandler() {
         }
         createTodo(details, projectName)
         createTodoDialog.close()
+        console.log(projectName)        
         updateScreen()
     })
 }
@@ -198,8 +191,7 @@ function createTodoDialogHandler() {
 function createProjectButtonHandler() {
     const button = createProjectInput.querySelector("button")
     const input = createProjectInput.querySelector("input")
-        ProjectManager.sync()
-    let Projects = ProjectManager.getProjects()
+
     button.addEventListener("click", () => {
         if (input.value) {
             createProject(input.value)
