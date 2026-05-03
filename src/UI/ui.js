@@ -6,12 +6,23 @@ const projectsList = document.querySelector("nav.sideBar .projectsList")
 const mainContentElement = document.querySelector("main.content")
 const createTodoDialog = document.querySelector("#createTodoDialog")
 const createProjectInput = document.querySelector(".createProjectInput")
-let Projects = viewAllProjects()
+
+class ProjectManager{
+    static #Projects = viewAllProjects()
+    static getProjects = function(){
+        return this.#Projects
+    }
+    static sync = function(){
+        this.#Projects = viewAllProjects()
+    }
+}
+console.log(ProjectManager.getProjects())
 
 function updateProjectsList() {
     projectsList.textContent = ''
     const projectNames = [];
-    Projects = viewAllProjects()
+    ProjectManager.sync()
+    let Projects = ProjectManager.getProjects()
     for (let i in Projects) {
         const project = Projects[i]
         projectNames.push(project.name)
@@ -35,18 +46,22 @@ function updateProjectsList() {
         const projectNameElement = document.createElement("div")
         projectNameElement.classList.add("projectName")
         projectNameElement.textContent = projectName
+        projectTile.appendChild(projectNameElement)
 
+        if(!(projectName === "default")){
         const removeButton = document.createElement("button")
         removeButton.textContent = "x"
         removeButton.classList.add("removeProjectButton")
+        projectTile.appendChild( removeButton)
 
-        projectTile.append(projectNameElement, removeButton)
+        }
+
         return projectTile
     }
 }
 export function setupUI() {
     updateScreen()
-    document.querySelector(".projectTile").click() // Show Default Project Content
+    document.querySelector(".projectTile[data-project-name='default'] .projectName").click() // Show Default Project Content
     createTodoDialogPopulator()
     createTodoDialogHandler()
     createTodoButtonHandler()
@@ -69,8 +84,23 @@ function updateScreen() {
             updateScreen()
         }
     })
+
+    mainContentElement.addEventListener("click",(e)=>{
+        const element = e.target
+        if(element.classList.contains("todoCompletion")){
+            if(element.checked){
+                EditATodo(element.parentElement.dataset.projectName,element.parentElement.dataset.todoTitle , "completed" , true)
+                element.parentElement.classList.add("todoCompleted")
+            }else if (element.checked === false){
+                EditATodo(element.parentElement.dataset.projectName,element.parentElement.dataset.todoTitle , "completed" , false)
+                element.parentElement.classList.remove("todoCompleted")
+            }
+        }
+    })
 }
 function showContentOfAProject(projectName) {
+    ProjectManager.sync()
+    let Projects = ProjectManager.getProjects()
     mainContentElement.textContent = ""
     const todos = Projects[projectName].todos
 
@@ -82,7 +112,8 @@ function showContentOfAProject(projectName) {
     function createTodoElement(todo) {
         const todoElement = document.createElement("div")
         todoElement.classList.add("todo")
-
+        todoElement.dataset.projectName = projectName
+        todoElement.dataset.todoTitle = todo.title;
         const todoTitle = document.createElement("h1")
         todoTitle.classList.add("todoTitle")
         todoTitle.textContent = todo.title
@@ -104,10 +135,14 @@ function showContentOfAProject(projectName) {
         const todoPriority = document.createElement("div")
         todoPriority.classList.add("todoPriority")
         todoPriority.textContent = todo.priority
-        const todoCompletion = document.createElement("span")
+        const todoCompletion = document.createElement("input")
         todoCompletion.classList.add("todoCompletion")
-        todoCompletion.textContent = todo.completed
-        todoElement.append(todoPriority, todoCompletion)
+        todoCompletion.type = "checkbox"
+        if(todo.completed){
+            todoElement.classList.add("todoCompleted")
+            todoCompletion.checked = true
+        };
+            todoElement.append(todoPriority, todoCompletion)
         return todoElement
     }
 }
@@ -121,6 +156,8 @@ function createTodoButtonHandler() {
 function createTodoDialogPopulator() {
     const projectsSelectMenu = createTodoDialog.querySelector("#projectsSelectMenu")
     projectsSelectMenu.textContent = ""
+        ProjectManager.sync()
+    let Projects = ProjectManager.getProjects()
     for (let i in Projects) {
         const project = Projects[i]
         projectsSelectMenu.appendChild(addOption(project.name))
@@ -161,6 +198,8 @@ function createTodoDialogHandler() {
 function createProjectButtonHandler() {
     const button = createProjectInput.querySelector("button")
     const input = createProjectInput.querySelector("input")
+        ProjectManager.sync()
+    let Projects = ProjectManager.getProjects()
     button.addEventListener("click", () => {
         if (input.value) {
             createProject(input.value)

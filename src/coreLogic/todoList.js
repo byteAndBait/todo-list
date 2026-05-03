@@ -69,12 +69,8 @@ const createTodo = (details, projectName) => {
 
 const EditATodo = (projectName, todoTitle, dataName, modification) => {
     syncLocal()
-    if (!projectName || !todoTitle || !dataName || !modification) {
-
-        return "Please Re-Check Your arguments"
-    }
     if (_getATodo(projectName, todoTitle) == undefined) {
-        return "Your Todo Doesn't Exist!"
+        throw new Error("Your Todo Doesn't Exist!")
     }
 
     const currentTodo = _getATodo(projectName, todoTitle)

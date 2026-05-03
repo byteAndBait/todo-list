@@ -134,6 +134,12 @@ nav.sideBar .createProjectInput input {
 }
 
 /* Main Content Styling */
+.todoCompleted {
+  opacity: .5;
+}
+.todoCompleted .todoTitle {
+  text-decoration: line-through;
+}
 main.content {
   flex: 2;
   background-color: white;
