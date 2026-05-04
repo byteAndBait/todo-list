@@ -7,7 +7,6 @@ const syncLocal = () => {
 const clearLocal = () => {
     _clearLocal()
     syncLocal()
-    createProject("default")
 }
 export let Projects = {}
 
@@ -49,11 +48,12 @@ const removeProject = (name) => {
     delete Projects[name]
     saveToLocal(Projects)
 }
-createProject("default")
+
+
+
 
 const createTodo = (details, projectName) => {
     syncLocal()
-    if (projectName == undefined) projectName = "default";
     if (Projects[projectName] == undefined) {
         return "Your Project Doesn't exist"
     }

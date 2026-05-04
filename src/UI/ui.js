@@ -6,25 +6,31 @@ const projectsList = document.querySelector("nav.sideBar .projectsList")
 const mainContentElement = document.querySelector("main.content")
 const createTodoDialog = document.querySelector("#createTodoDialog")
 const createProjectInput = document.querySelector(".createProjectInput")
-
+let defaultProjectTodos = {}
+const defaultProjectName = "All Todos"
 let Projects = viewAllProjects()
 
 function updateProjectsList() {
     projectsList.textContent = ''
     const projectNames = [];
+    
     Projects = viewAllProjects()
 
     for (let i in Projects) {
         const project = Projects[i]
         projectNames.push(project.name)
+
+        defaultProjectTodos = Object.assign(defaultProjectTodos,Projects[i].todos)
     }
+
+    projectsList.appendChild(createProjectTile(defaultProjectName))
 
     for (let i in projectNames) {
         const projectName = projectNames[i]
-
         const projectTileElement = createProjectTile(projectName)
         projectsList.appendChild(projectTileElement)
     }
+
 
 
 
@@ -39,12 +45,11 @@ function updateProjectsList() {
         projectNameElement.textContent = projectName
         projectTile.appendChild(projectNameElement)
 
-        if (!(projectName === "default")) {
+        if (!(projectName === defaultProjectName)) {
             const removeButton = document.createElement("button")
             removeButton.textContent = "x"
             removeButton.classList.add("removeProjectButton")
             projectTile.appendChild(removeButton)
-
         }
 
         return projectTile
@@ -52,7 +57,6 @@ function updateProjectsList() {
 }
 export function setupUI() {
     updateScreen()
-    document.querySelector(".projectTile[data-project-name='default'] .projectName").click() // Show Default Project Content
     createTodoDialogPopulator()
     createTodoDialogHandler()
     createTodoButtonHandler()
@@ -61,6 +65,7 @@ export function setupUI() {
 }
 function updateScreen() {
     updateProjectsList()
+    mainContentElement.textContent =""
     projectsList.addEventListener("click", (e) => {
         if (e.target.classList.contains("projectName")) {
             showContentOfAProject(e.target.parentElement.dataset.projectName)
@@ -94,7 +99,12 @@ function showContentOfAProject(projectName) {
     Projects = viewAllProjects()
 
     mainContentElement.textContent = ""
-    const todos = Projects[projectName].todos
+    let todos;
+    if(projectName === defaultProjectName){
+         todos = defaultProjectTodos
+    }else{
+         todos = Projects[projectName].todos
+    }
 
 
     for (let i in todos) {
@@ -183,7 +193,6 @@ function createTodoDialogHandler() {
         }
         createTodo(details, projectName)
         createTodoDialog.close()
-        console.log(projectName)        
         updateScreen()
     })
 }
