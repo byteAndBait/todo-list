@@ -6,58 +6,9 @@ const projectsList = document.querySelector("nav.sideBar .projectsList")
 const mainContentElement = document.querySelector("main.content")
 const createTodoDialog = document.querySelector("#createTodoDialog")
 const createProjectInput = document.querySelector(".createProjectInput")
-let defaultProjectTodos = {}
 const defaultProjectName = "All Todos"
 let Projects = viewAllProjects()
 
-function updateProjectsList() {
-    projectsList.textContent = ''
-    const projectNames = [];
-    
-    Projects = viewAllProjects()
-            defaultProjectTodos = {}
-
-    for (let i in Projects) {
-        const project = Projects[i]
-        projectNames.push(project.name)
-
-        defaultProjectTodos = Object.assign(defaultProjectTodos,Projects[i].todos)
-    }
-
-    projectsList.appendChild(createProjectTile(defaultProjectName))
-
-    for (let i in projectNames) {
-        const projectName = projectNames[i]
-        if(!(projectName === "Uncategorized")){
-            const projectTileElement = createProjectTile(projectName)
-            projectsList.appendChild(projectTileElement)
-        }
-    }
-
-
-
-
-
-    function createProjectTile(projectName) {
-        const projectTile = document.createElement("div")
-        projectTile.classList.add("projectTile")
-        projectTile.dataset.projectName = projectName
-
-        const projectNameElement = document.createElement("div")
-        projectNameElement.classList.add("projectName")
-        projectNameElement.textContent = projectName
-        projectTile.appendChild(projectNameElement)
-
-        if (!(projectName === defaultProjectName)) {
-            const removeButton = document.createElement("button")
-            removeButton.textContent = "x"
-            removeButton.classList.add("removeProjectButton")
-            projectTile.appendChild(removeButton)
-        }
-
-        return projectTile
-    }
-}
 export function setupUI() {
     updateScreen()
     createTodoDialogPopulator()
@@ -66,9 +17,10 @@ export function setupUI() {
     createProjectButtonHandler()
 
 }
+
 function updateScreen() {
     updateProjectsList()
-    mainContentElement.textContent =""
+    mainContentElement.textContent = ""
     projectsList.addEventListener("click", (e) => {
         if (e.target.classList.contains("projectName")) {
             showContentOfAProject(e.target.parentElement.dataset.projectName)
@@ -91,10 +43,7 @@ function updateScreen() {
             if (element.checked) {
                 const projectName = element.parentElement.dataset.projectName;
                 const todoTitle = element.parentElement.dataset.todoTitle;
-                if(projectName === "All Todos"){
-                    
-                }
-                EditATodo(projectName, todoTitle, "completed", true)
+                EditATodo(element.parentElement.dataset.projectName, element.parentElement.dataset.todoTitle, "completed", true)
                 element.parentElement.classList.add("todoCompleted")
             } else if (element.checked === false) {
                 EditATodo(element.parentElement.dataset.projectName, element.parentElement.dataset.todoTitle, "completed", false)
@@ -103,23 +52,77 @@ function updateScreen() {
         }
     })
 }
+
+
+
+function updateProjectsList() {
+    Projects = viewAllProjects()
+    projectsList.textContent = ''
+    projectsList.appendChild(createProjectTile(defaultProjectName))
+
+    const projectNames = [];
+
+    for (let i in Projects) {
+        const project = Projects[i]
+        projectNames.push(project.name)
+    }
+
+
+    for (let i in projectNames) {
+        const projectName = projectNames[i]
+        if (!(projectName === "Uncategorized")) { // To Hide the Uncategorized projectTile
+            const projectTileElement = createProjectTile(projectName)
+            projectsList.appendChild(projectTileElement)
+        }
+    }
+
+
+
+
+
+    function createProjectTile(projectName) {
+        const projectTile = document.createElement("div")
+        projectTile.classList.add("projectTile")
+        projectTile.dataset.projectName = projectName
+
+        const projectNameElement = document.createElement("div")
+        projectNameElement.classList.add("projectName")
+        projectNameElement.textContent = projectName
+        projectTile.appendChild(projectNameElement)
+
+        if (!(projectName === defaultProjectName)) { // No remove button on All Todos Project
+            const removeButton = document.createElement("button")
+            removeButton.textContent = "x"
+            removeButton.classList.add("removeProjectButton")
+            projectTile.appendChild(removeButton)
+        }
+
+        return projectTile
+    }
+}
+
+
 function showContentOfAProject(projectName) {
     Projects = viewAllProjects()
-
     mainContentElement.textContent = ""
     let todos;
-    if(projectName === defaultProjectName){
-         todos = defaultProjectTodos
-    }else{
-         todos = Projects[projectName].todos
+    if (projectName === defaultProjectName) {
+        for (let i in Projects) {
+            const project = Projects[i];
+            for (let j in project.todos) {
+                mainContentElement.appendChild(createTodoElement(project.todos[j], project.name))
+            }
+        }
+    } else {
+        todos = Projects[projectName].todos
     }
 
 
     for (let i in todos) {
-        mainContentElement.appendChild(createTodoElement(todos[i]))
+        mainContentElement.appendChild(createTodoElement(todos[i], projectName))
     }
 
-    function createTodoElement(todo) {
+    function createTodoElement(todo, projectName) {
         const todoElement = document.createElement("div")
         todoElement.classList.add("todo")
         todoElement.dataset.projectName = projectName
