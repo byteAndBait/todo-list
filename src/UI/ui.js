@@ -15,6 +15,7 @@ function updateProjectsList() {
     const projectNames = [];
     
     Projects = viewAllProjects()
+            defaultProjectTodos = {}
 
     for (let i in Projects) {
         const project = Projects[i]
@@ -27,8 +28,10 @@ function updateProjectsList() {
 
     for (let i in projectNames) {
         const projectName = projectNames[i]
-        const projectTileElement = createProjectTile(projectName)
-        projectsList.appendChild(projectTileElement)
+        if(!(projectName === "Uncategorized")){
+            const projectTileElement = createProjectTile(projectName)
+            projectsList.appendChild(projectTileElement)
+        }
     }
 
 
@@ -86,7 +89,12 @@ function updateScreen() {
         const element = e.target
         if (element.classList.contains("todoCompletion")) {
             if (element.checked) {
-                EditATodo(element.parentElement.dataset.projectName, element.parentElement.dataset.todoTitle, "completed", true)
+                const projectName = element.parentElement.dataset.projectName;
+                const todoTitle = element.parentElement.dataset.todoTitle;
+                if(projectName === "All Todos"){
+                    
+                }
+                EditATodo(projectName, todoTitle, "completed", true)
                 element.parentElement.classList.add("todoCompleted")
             } else if (element.checked === false) {
                 EditATodo(element.parentElement.dataset.projectName, element.parentElement.dataset.todoTitle, "completed", false)
