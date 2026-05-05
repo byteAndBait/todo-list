@@ -93,11 +93,11 @@ nav.sideBar .projectTile {
     box-shadow: rgba(0, 0, 0, 0.15) 1.95px 1.95px 2.6px;
   }
 }
-.projectTile .projectName{
-  padding:10px;
+.projectTile .projectName {
+  padding: 10px;
   flex: 5;
 }
-nav.sideBar .projectTile:hover .removeProjectButton{
+nav.sideBar .projectTile:hover .removeProjectButton {
   opacity: 1;
 }
 nav.sideBar .projectTile .removeProjectButton {
@@ -106,7 +106,7 @@ nav.sideBar .projectTile .removeProjectButton {
   transition: 300ms ease;
   background-color: transparent;
   color: grey;
-  flex:1;
+  flex: 1;
   height: 100%;
 }
 nav.sideBar .projectsList .projectTile.active {
@@ -135,7 +135,7 @@ nav.sideBar .createProjectInput input {
 
 /* Main Content Styling */
 .todoCompleted {
-  opacity: .5;
+  opacity: 0.5;
 }
 .todoCompleted .todoTitle {
   text-decoration: line-through;

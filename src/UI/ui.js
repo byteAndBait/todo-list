@@ -21,6 +21,13 @@ export function setupUI() {
 function updateScreen() {
     updateProjectsList()
     mainContentElement.textContent = ""
+
+    projectsListEventsHandler()
+    mainContentElementEventsHandler()
+
+}
+
+function projectsListEventsHandler() {
     projectsList.addEventListener("click", (e) => {
         if (e.target.classList.contains("projectName")) {
             showContentOfAProject(e.target.parentElement.dataset.projectName)
@@ -36,7 +43,8 @@ function updateScreen() {
             updateScreen()
         }
     })
-
+}
+function mainContentElementEventsHandler() {
     mainContentElement.addEventListener("click", (e) => {
         const element = e.target
         if (element.classList.contains("todoCompletion")) {
@@ -52,8 +60,6 @@ function updateScreen() {
         }
     })
 }
-
-
 
 function updateProjectsList() {
     Projects = viewAllProjects()
@@ -113,6 +119,7 @@ function showContentOfAProject(projectName) {
                 mainContentElement.appendChild(createTodoElement(project.todos[j], project.name))
             }
         }
+        return
     } else {
         todos = Projects[projectName].todos
     }
@@ -167,9 +174,9 @@ function createTodoButtonHandler() {
 }
 
 function createTodoDialogPopulator() {
+    Projects = viewAllProjects()
     const projectsSelectMenu = createTodoDialog.querySelector("#projectsSelectMenu")
     projectsSelectMenu.textContent = ""
-    Projects = viewAllProjects()
 
     for (let i in Projects) {
         const project = Projects[i]

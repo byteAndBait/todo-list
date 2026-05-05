@@ -1,6 +1,6 @@
 export const todoEdit = (state) => ({
     edit: (dataName, modification) => {
-        
+
         if (dataName === "priority") {
             switch (modification) {
                 case "Low":
@@ -16,8 +16,8 @@ export const todoEdit = (state) => ({
                     return "Please enter Priority [Low,Medium,High]"
             }
         }
-            state[dataName] = modification
-            return;
+        state[dataName] = modification
+        return;
     }
 })
 export const projectAddTodo = (state) => ({
