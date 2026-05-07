@@ -22,11 +22,11 @@ export const todoEdit = (state) => ({
 })
 export const projectAddTodo = (state) => ({
     addTodo: (todo) => {
-        state.todos[todo.title] = todo
+        state.todos[todo.id] = todo
     }
 })
 export const projectRemoveTodo = (state) => ({
-    removeTodo: (title) => {
-        delete state.todos[title]
+    removeTodo: (id) => {
+        delete state.todos[id]
     }
 })

@@ -10,26 +10,21 @@ const defaultProjectName = "All Todos"
 let Projects = viewAllProjects()
 
 export function setupUI() {
-    updateScreen()
+    updateProjectsList()
     createTodoDialogPopulator()
     createTodoDialogHandler()
     createTodoButtonHandler()
     createProjectButtonHandler()
-
-}
-
-function updateScreen() {
-    updateProjectsList()
-    mainContentElement.textContent = ""
-
     projectsListEventsHandler()
     mainContentElementEventsHandler()
-
+    updateMainContent()
 }
+
 
 function projectsListEventsHandler() {
     projectsList.addEventListener("click", (e) => {
         if (e.target.classList.contains("projectName")) {
+
             showContentOfAProject(e.target.parentElement.dataset.projectName)
 
             projectsList.childNodes.forEach((child) => {
@@ -40,23 +35,53 @@ function projectsListEventsHandler() {
         if (e.target.classList.contains("removeProjectButton")) {
             removeProject(e.target.parentElement.dataset.projectName)
             createTodoDialogPopulator()
-            updateScreen()
+            updateProjectsList()
         }
     })
 }
+
+
+function updateMainContent() {
+    if (document.querySelector(".projectTile.active")) {
+        document.querySelector(".projectTile.active .projectName").click();
+        return
+    }
+    if (document.querySelector(`.projectTile[data-project-name='${defaultProjectName}'] .projectName`)) {
+
+        document.querySelector(`.projectTile[data-project-name='${defaultProjectName}'] .projectName`).click()
+        return
+    }
+    showContentOfAProject(defaultProjectName)
+}
+
+
+
+
 function mainContentElementEventsHandler() {
     mainContentElement.addEventListener("click", (e) => {
         const element = e.target
+        const projectName = element.parentElement.dataset.projectName;
         if (element.classList.contains("todoCompletion")) {
+            const todo = viewATodo(projectName, element.parentElement.id)
             if (element.checked) {
-                const projectName = element.parentElement.dataset.projectName;
-                const todoTitle = element.parentElement.dataset.todoTitle;
-                EditATodo(element.parentElement.dataset.projectName, element.parentElement.dataset.todoTitle, "completed", true)
+                EditATodo(projectName, todo.id, "completed", true)
                 element.parentElement.classList.add("todoCompleted")
             } else if (element.checked === false) {
-                EditATodo(element.parentElement.dataset.projectName, element.parentElement.dataset.todoTitle, "completed", false)
+                EditATodo(projectName, todo.id, "completed", false)
                 element.parentElement.classList.remove("todoCompleted")
             }
+            return;
+        }
+        if (element.classList.contains("todoRemove")) {
+            const todo = viewATodo(projectName, element.parentElement.id)
+            removeATodo(projectName, todo.id)
+            updateMainContent()
+
+        }
+        if (element.classList.contains("todoEdit")) {
+            const todo = viewATodo(projectName, element.parentElement.id)
+            editTodoDialog(projectName, todo)
+
         }
     })
 }
@@ -105,6 +130,8 @@ function updateProjectsList() {
 
         return projectTile
     }
+    updateMainContent()
+
 }
 
 
@@ -132,6 +159,7 @@ function showContentOfAProject(projectName) {
     function createTodoElement(todo, projectName) {
         const todoElement = document.createElement("div")
         todoElement.classList.add("todo")
+        todoElement.id = todo.id;
         todoElement.dataset.projectName = projectName
         todoElement.dataset.todoTitle = todo.title;
         const todoTitle = document.createElement("h1")
@@ -162,7 +190,13 @@ function showContentOfAProject(projectName) {
             todoElement.classList.add("todoCompleted")
             todoCompletion.checked = true
         };
-        todoElement.append(todoPriority, todoCompletion)
+        const removeButton = document.createElement("button")
+        removeButton.textContent = "remove"
+        removeButton.classList.add("todoRemove")
+        const editButton = document.createElement("button")
+        editButton.textContent = "edit"
+        editButton.classList.add("todoEdit")
+        todoElement.append(todoPriority, todoCompletion, removeButton, editButton)
         return todoElement
     }
 }
@@ -211,7 +245,7 @@ function createTodoDialogHandler() {
         }
         createTodo(details, projectName)
         createTodoDialog.close()
-        updateScreen()
+        updateMainContent()
     })
 }
 
@@ -225,8 +259,40 @@ function createProjectButtonHandler() {
             input.value = ""
             Projects = viewAllProjects()
             createTodoDialogPopulator()
-            updateScreen()
+            updateProjectsList()
+
         }
     })
 
+}
+
+function editTodoDialog(projectName, todo) {
+    const dialog = document.getElementById("editTodoDialog")
+    dialog.querySelector("#titleOfTodo").value = todo.title;
+    dialog.querySelector("#dueDateOfTodo").value = todo.dueDate
+    dialog.querySelector("#descriptionOfTodo").value = todo.description
+    dialog.querySelector(`option[value='${todo.priority}']`).selected = "selected"
+    dialog.showModal()
+    const closeButton = dialog.querySelector("button.closeButton")
+    closeButton.addEventListener("click", () => {
+        dialog.close()
+    })
+    const form = dialog.querySelector("form")
+
+    form.addEventListener("submit", () => {
+        event.preventDefault()
+        const modifiedDetails = {
+            title: dialog.querySelector("#titleOfTodo").value,
+            dueDate: dialog.querySelector("#dueDateOfTodo").value,
+            description: dialog.querySelector("#descriptionOfTodo").value,
+            priority: dialog.querySelector("p select#prioritySelectMenu").value
+        }
+        for (let dataName in modifiedDetails) {
+            EditATodo(projectName, todo.id, dataName, modifiedDetails[dataName])
+
+        }
+        dialog.close()
+        updateMainContent()
+
+    })
 }

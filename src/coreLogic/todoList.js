@@ -18,6 +18,7 @@ class Todo {
         this.priority = details.priority
         this.completed = details.completed || false
         this.dueDate = details.dueDate
+        this.id = crypto.randomUUID()
     }
 }
 class Project {
@@ -57,9 +58,6 @@ const createTodo = (details, projectName) => {
     if (Projects[projectName] == undefined) {
         return "Your Project Doesn't exist"
     }
-    if (Projects[projectName].todos[details.title]) {
-        return "Your Todo Does Exist!"
-    }
     const todoToBeCreated = new Todo(details)
     Projects[projectName].addTodo(
         Object.assign(todoToBeCreated, todoEdit(todoToBeCreated)
@@ -67,44 +65,45 @@ const createTodo = (details, projectName) => {
     saveToLocal(Projects)
 }
 
-const EditATodo = (projectName, todoTitle, dataName, modification) => {
+const EditATodo = (projectName, id, dataName, modification) => {
     syncLocal()
-    if (_getATodo(projectName, todoTitle) == undefined) {
-        throw new Error("Your Todo Doesn't Exist!")
-    }
 
-    const currentTodo = _getATodo(projectName, todoTitle)
+    const currentTodo = _getATodo(projectName, id)
     currentTodo.edit(dataName, modification)
     saveToLocal(Projects)
 }
 
-const removeATodo = (projectName, todoTitle) => {
+const removeATodo = (projectName, id) => {
     syncLocal()
-    Projects[projectName].removeTodo(todoTitle)
+    Projects[projectName].removeTodo(id)
     saveToLocal(Projects)
 }
 
 
 // Internal use only functions
-const _getATodo = (projectName, todoTitle) => {
+const _getATodo = (projectName, id) => {
     syncLocal()
     try {
-        Projects[projectName].todos[todoTitle]
+        if (Projects[projectName].todos[id]) {
+            const todoToGet = Projects[projectName].todos[id]
+            return todoToGet
+        }
     } catch (error) {
-        return undefined;
+        console.log(projectName, id)
+        throw new Error("Your Todo Doesn't Exist!")
     }
-    const todoToGet = Projects[projectName].todos[todoTitle]
-    return todoToGet
+
+
 }
 
 
 // View Data Function (Doesn't affect the Projects object)
-const viewATodo = (projectName, todoTitle) => {
+const viewATodo = (projectName, id) => {
     syncLocal()
-    if (_getATodo(projectName, todoTitle)) {
-        return JSON.parse(JSON.stringify(_getATodo(projectName, todoTitle)))
+    if (_getATodo(projectName, id)) {
+        return JSON.parse(JSON.stringify(_getATodo(projectName, id)))
     }
-    return "Your Todo Doesn't Exist!"
+    throw new Error("Your Todo Doesn't Exist!")
 }
 
 const viewAProject = (projectName) => {
