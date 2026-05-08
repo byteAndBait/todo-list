@@ -1,3 +1,4 @@
+import { isMatch, formatDistanceToNow } from "date-fns";
 export const todoEdit = (state) => ({
     edit: (dataName, modification) => {
 
@@ -15,6 +16,19 @@ export const todoEdit = (state) => ({
                 default:
                     return "Please enter Priority [Low,Medium,High]"
             }
+            return
+        }
+        if (dataName === "dueDate") {
+
+            if (modification === "") {
+                state[dataName] = ""
+                return
+            }
+            if (!isMatch(modification, 'yyyy-MM-dd')) {
+                throw new Error("Not a valid date")
+            }
+            state[dataName] = formatDistanceToNow(modification)
+            return
         }
         state[dataName] = modification
         return;

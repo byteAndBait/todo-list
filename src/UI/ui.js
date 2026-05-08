@@ -58,28 +58,28 @@ function updateMainContent() {
 
 
 function mainContentElementEventsHandler() {
-    mainContentElement.addEventListener("click", (e) => {
-        const element = e.target
-        const projectName = element.parentElement.dataset.projectName;
+    mainContentElement.addEventListener("click", () => {
+        const element = event.target
+        const projectName = element.dataset.projectName;
         if (element.classList.contains("todoCompletion")) {
-            const todo = viewATodo(projectName, element.parentElement.id)
+            const todo = viewATodo(projectName, element.dataset.todoId)
             if (element.checked) {
                 EditATodo(projectName, todo.id, "completed", true)
-                element.parentElement.classList.add("todoCompleted")
+                document.querySelector(`.todo[id='${todo.id}']`).classList.add("todoCompleted")
             } else if (element.checked === false) {
                 EditATodo(projectName, todo.id, "completed", false)
-                element.parentElement.classList.remove("todoCompleted")
+                document.querySelector(`.todo[id='${todo.id}']`).classList.remove("todoCompleted")
             }
             return;
         }
         if (element.classList.contains("todoRemove")) {
-            const todo = viewATodo(projectName, element.parentElement.id)
+            const todo = viewATodo(projectName, element.dataset.todoId)
             removeATodo(projectName, todo.id)
             updateMainContent()
 
         }
         if (element.classList.contains("todoEdit")) {
-            const todo = viewATodo(projectName, element.parentElement.id)
+            const todo = viewATodo(projectName, element.dataset.todoId)
             editTodoDialog(projectName, todo)
 
         }
@@ -161,42 +161,64 @@ function showContentOfAProject(projectName) {
         todoElement.classList.add("todo")
         todoElement.id = todo.id;
         todoElement.dataset.projectName = projectName
-        todoElement.dataset.todoTitle = todo.title;
+
+        const todoMainTitle = document.createElement("div")
+        todoMainTitle.classList.add("todoMainTitle")
+
         const todoTitle = document.createElement("h1")
         todoTitle.classList.add("todoTitle")
         todoTitle.textContent = todo.title
-        todoElement.appendChild(todoTitle)
-        if (todo.description) {
-            const todoDescription = document.createElement("p")
-            todoDescription.classList.add("todoDescription")
-            todoDescription.textContent = todo.description
-            todoElement.appendChild(todoDescription)
 
-        }
 
-        if (todo.dueDate) {
-            const todoDueDate = document.createElement("div")
-            todoDueDate.classList.add("todoDueDate")
-            todoDueDate.textContent = todo.dueDate;
-            todoElement.appendChild(todoDueDate)
-        }
         const todoPriority = document.createElement("div")
         todoPriority.classList.add("todoPriority")
         todoPriority.textContent = todo.priority
+
         const todoCompletion = document.createElement("input")
         todoCompletion.classList.add("todoCompletion")
         todoCompletion.type = "checkbox"
+        todoCompletion.dataset.todoId = todo.id
+        todoCompletion.dataset.projectName = projectName
+
         if (todo.completed) {
+            todoCompletion.checked = "checked"
             todoElement.classList.add("todoCompleted")
-            todoCompletion.checked = true
-        };
+        }
+        const todoDueDate = document.createElement("div")
+        todoDueDate.classList.add("todoDueDate")
+        todoDueDate.textContent = todo.dueDate
+        todoMainTitle.append(todoCompletion, todoTitle, todoDueDate, todoPriority)
+
+        // Expanded Details
+        const details = document.createElement("div")
+        details.classList.add("details")
+
+
+        const todoDescription = document.createElement("p")
+        todoDescription.classList.add("todoDescription")
+        todoDescription.textContent = todo.description
+
+
+
+
+        // Utilities
+        const utilities = document.createElement("div")
+        utilities.classList.add("utilities")
         const removeButton = document.createElement("button")
         removeButton.textContent = "remove"
         removeButton.classList.add("todoRemove")
+        removeButton.dataset.todoId = todo.id
+        removeButton.dataset.projectName = projectName
+
         const editButton = document.createElement("button")
         editButton.textContent = "edit"
         editButton.classList.add("todoEdit")
-        todoElement.append(todoPriority, todoCompletion, removeButton, editButton)
+        editButton.dataset.todoId = todo.id
+        editButton.dataset.projectName = projectName
+        utilities.append(removeButton, editButton)
+
+        details.append(todoDescription, utilities)
+        todoElement.append(todoMainTitle, details)
         return todoElement
     }
 }
@@ -277,8 +299,9 @@ function editTodoDialog(projectName, todo) {
     closeButton.addEventListener("click", () => {
         dialog.close()
     })
+    const dueDateInput = dialog.querySelector("p #dueDateOfTodo")
+    dueDateInput.min = format(new Date(), 'yyyy-MM-dd')
     const form = dialog.querySelector("form")
-
     form.addEventListener("submit", () => {
         event.preventDefault()
         const modifiedDetails = {
@@ -288,6 +311,7 @@ function editTodoDialog(projectName, todo) {
             priority: dialog.querySelector("p select#prioritySelectMenu").value
         }
         for (let dataName in modifiedDetails) {
+
             EditATodo(projectName, todo.id, dataName, modifiedDetails[dataName])
 
         }

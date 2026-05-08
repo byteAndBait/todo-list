@@ -1,5 +1,6 @@
 import { todoEdit, projectAddTodo, projectRemoveTodo } from "./compositors.js"
 import { getFromLocal, saveToLocal, _clearLocal } from "./localStorageLogic.js"
+import { isMatch, formatDistanceToNow } from "date-fns";
 
 const syncLocal = () => {
     Projects = getFromLocal(Projects)
@@ -17,7 +18,16 @@ class Todo {
         this.description = details.description
         this.priority = details.priority
         this.completed = details.completed || false
-        this.dueDate = details.dueDate
+        if (details.dueDate === "") {
+            this.dueDate = ""
+        } else {
+            if (!isMatch(details.dueDate, 'yyyy-MM-dd')) {
+                throw new Error("Not a valid date")
+            }
+            this.dueDate = formatDistanceToNow(details.dueDate)
+        }
+
+
         this.id = crypto.randomUUID()
     }
 }
@@ -89,7 +99,6 @@ const _getATodo = (projectName, id) => {
             return todoToGet
         }
     } catch (error) {
-        console.log(projectName, id)
         throw new Error("Your Todo Doesn't Exist!")
     }
 
