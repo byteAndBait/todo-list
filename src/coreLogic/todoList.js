@@ -94,7 +94,7 @@ const removeATodo = (projectName, id) => {
 const _getATodo = (projectName, id) => {
     syncLocal()
     try {
-        if (Projects[projectName].todos[id]) {
+        if (Projects[projectName].todos[id] != undefined) {
             const todoToGet = Projects[projectName].todos[id]
             return todoToGet
         }
