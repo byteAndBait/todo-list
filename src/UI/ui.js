@@ -1,7 +1,7 @@
 import "../css/main.css"
 import "../css/normalize.css"
 import { clearLocal, createTodo, EditATodo, viewATodo, removeATodo, createProject, removeProject, viewAProject, viewAllProjects } from "../coreLogic/todoList.js"
-import { format } from "date-fns"
+import { format,formatDistanceToNow } from "date-fns"
 const projectsList = document.querySelector("nav.sideBar .projectsList")
 const mainContentElement = document.querySelector("main.content")
 const createTodoDialog = document.querySelector("#createTodoDialog")
@@ -186,7 +186,11 @@ function showContentOfAProject(projectName) {
         }
         const todoDueDate = document.createElement("div")
         todoDueDate.classList.add("todoDueDate")
-        todoDueDate.textContent = todo.dueDate
+        try{
+            todoDueDate.textContent = formatDistanceToNow(todo.dueDate)
+        }catch(error){
+            todoDueDate.textContent = ""
+        }
         todoMainTitle.append(todoCompletion, todoTitle, todoDueDate, todoPriority)
 
         // Expanded Details
@@ -301,6 +305,7 @@ function editTodoDialog(projectName, todo) {
     })
     const dueDateInput = dialog.querySelector("p #dueDateOfTodo")
     dueDateInput.min = format(new Date(), 'yyyy-MM-dd')
+    dueDateInput.value = viewATodo(projectName,todo.id).dueDate
     const form = dialog.querySelector("form")
     form.addEventListener("submit", () => {
         event.preventDefault()
