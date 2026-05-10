@@ -1,10 +1,11 @@
 import "../css/main.css"
 import "../css/normalize.css"
-import { clearLocal, createTodo, EditATodo, viewATodo, removeATodo, createProject, removeProject, viewAProject, viewAllProjects } from "../coreLogic/todoList.js"
-import { format,formatDistanceToNow } from "date-fns"
+import { createTodo, EditATodo, viewATodo, removeATodo, createProject, removeProject, viewAllProjects } from "../coreLogic/todoList.js"
+import { format, formatDistanceToNow } from "date-fns"
 const projectsList = document.querySelector("nav.sideBar .projectsList")
 const mainContentElement = document.querySelector("main.content")
-const createTodoDialog = document.querySelector("#createTodoDialog")
+const createTodoDialogElement = document.querySelector("#createTodoDialog")
+const editTodoDialogElement = document.querySelector("#editTodoDialog")
 const createProjectInput = document.querySelector(".createProjectInput")
 const defaultProjectName = "All Todos"
 let Projects = viewAllProjects()
@@ -12,8 +13,8 @@ let Projects = viewAllProjects()
 export function setupUI() {
     updateProjectsList()
     createTodoDialogPopulator()
-    createTodoDialogHandler()
-    createTodoButtonHandler()
+    createTodoDialogEventsHandler()
+    editTodoDialogEventsHandler()
     createProjectButtonHandler()
     projectsListEventsHandler()
     mainContentElementEventsHandler()
@@ -51,16 +52,16 @@ function updateMainContent() {
         document.querySelector(`.projectTile[data-project-name='${defaultProjectName}'] .projectName`).click()
         return
     }
-    showContentOfAProject(defaultProjectName)
 }
 
 
 
 
 function mainContentElementEventsHandler() {
-    mainContentElement.addEventListener("click", () => {
-        const element = event.target
+    mainContentElement.addEventListener("click", (e) => {
+        const element = e.target
         const projectName = element.dataset.projectName;
+
         if (element.classList.contains("todoCompletion")) {
             const todo = viewATodo(projectName, element.dataset.todoId)
             if (element.checked) {
@@ -79,9 +80,12 @@ function mainContentElementEventsHandler() {
 
         }
         if (element.classList.contains("todoEdit")) {
+            console.log(`From Events
+projectName: ${projectName}
+ID: ${element.dataset.todoId}`)
             const todo = viewATodo(projectName, element.dataset.todoId)
-            editTodoDialog(projectName, todo)
-
+            editTodoDialogPopulator(projectName, todo)
+            editTodoDialogElement.showModal()
         }
     })
 }
@@ -186,9 +190,9 @@ function showContentOfAProject(projectName) {
         }
         const todoDueDate = document.createElement("div")
         todoDueDate.classList.add("todoDueDate")
-        try{
+        try {
             todoDueDate.textContent = formatDistanceToNow(todo.dueDate)
-        }catch(error){
+        } catch (error) {
             todoDueDate.textContent = ""
         }
         todoMainTitle.append(todoCompletion, todoTitle, todoDueDate, todoPriority)
@@ -226,16 +230,12 @@ function showContentOfAProject(projectName) {
         return todoElement
     }
 }
-function createTodoButtonHandler() {
-    const addTodoButton = document.querySelector("#createTodoButton")
-    addTodoButton.addEventListener("click", (e) => {
-        createTodoDialog.showModal()
-    })
-}
+
+// Todo Creation
 
 function createTodoDialogPopulator() {
     Projects = viewAllProjects()
-    const projectsSelectMenu = createTodoDialog.querySelector("#projectsSelectMenu")
+    const projectsSelectMenu = createTodoDialogElement.querySelector("#projectsSelectMenu")
     projectsSelectMenu.textContent = ""
 
     for (let i in Projects) {
@@ -249,17 +249,21 @@ function createTodoDialogPopulator() {
         option.textContent = value;
         return option
     }
-    const dueDateInput = createTodoDialog.querySelector("p #dueDateOfTodo")
+    const dueDateInput = createTodoDialogElement.querySelector("p #dueDateOfTodo")
     dueDateInput.min = format(new Date(), 'yyyy-MM-dd')
 
-    const closeButton = createTodoDialog.querySelector("button.closeButton")
-    closeButton.addEventListener("click", () => {
-        createTodoDialog.close()
-    })
 }
 
-function createTodoDialogHandler() {
-    const form = createTodoDialog.querySelector("form")
+function createTodoDialogEventsHandler() {
+    const form = createTodoDialogElement.querySelector("form")
+    const closeButton = createTodoDialogElement.querySelector("button")
+    const createTodoButton = document.getElementById("createTodoButton")
+    createTodoButton.addEventListener("click", () => {
+        createTodoDialogElement.showModal("")
+    })
+    closeButton.addEventListener("click", () => {
+        createTodoDialogElement.close()
+    })
     form.addEventListener("submit", () => {
         event.preventDefault()
         const projectName = form.querySelector("p select#projectsSelectMenu").value
@@ -270,11 +274,14 @@ function createTodoDialogHandler() {
             priority: form.querySelector("p select#prioritySelectMenu").value
         }
         createTodo(details, projectName)
-        createTodoDialog.close()
+        createTodoDialogElement.close()
         updateMainContent()
     })
 }
 
+
+
+// Project Creation
 function createProjectButtonHandler() {
     const button = createProjectInput.querySelector("button")
     const input = createProjectInput.querySelector("input")
@@ -292,36 +299,40 @@ function createProjectButtonHandler() {
 
 }
 
-function editTodoDialog(projectName, todo) {
-    const dialog = document.getElementById("editTodoDialog")
-    dialog.querySelector("#titleOfTodo").value = todo.title;
-    dialog.querySelector("#dueDateOfTodo").value = todo.dueDate
-    dialog.querySelector("#descriptionOfTodo").value = todo.description
-    dialog.querySelector(`option[value='${todo.priority}']`).selected = "selected"
-    dialog.showModal()
-    const closeButton = dialog.querySelector("button.closeButton")
-    closeButton.addEventListener("click", () => {
-        dialog.close()
-    })
-    const dueDateInput = dialog.querySelector("p #dueDateOfTodo")
-    dueDateInput.min = format(new Date(), 'yyyy-MM-dd')
-    dueDateInput.value = viewATodo(projectName,todo.id).dueDate
-    const form = dialog.querySelector("form")
+// Editing A todo
+function editTodoDialogEventsHandler() {
+
+    const form = editTodoDialogElement.querySelector("form")
+
     form.addEventListener("submit", () => {
         event.preventDefault()
         const modifiedDetails = {
-            title: dialog.querySelector("#titleOfTodo").value,
-            dueDate: dialog.querySelector("#dueDateOfTodo").value,
-            description: dialog.querySelector("#descriptionOfTodo").value,
-            priority: dialog.querySelector("p select#prioritySelectMenu").value
+            title: editTodoDialogElement.querySelector("#titleOfTodo").value,
+            dueDate: editTodoDialogElement.querySelector("#dueDateOfTodo").value,
+            description: editTodoDialogElement.querySelector("#descriptionOfTodo").value,
+            priority: editTodoDialogElement.querySelector("p select#prioritySelectMenu").value
         }
         for (let dataName in modifiedDetails) {
-
-            EditATodo(projectName, todo.id, dataName, modifiedDetails[dataName])
-
+            EditATodo(editTodoDialogElement.dataset.projectName, editTodoDialogElement.dataset.todoToBeEditedId, dataName, modifiedDetails[dataName])
         }
-        dialog.close()
+        editTodoDialogElement.close()
         updateMainContent()
 
     })
+    const closeButton = editTodoDialogElement.querySelector("button.closeButton")
+    closeButton.addEventListener("click", () => {
+        editTodoDialogElement.close()
+    })
+}
+
+function editTodoDialogPopulator(projectName, todo) {
+    editTodoDialogElement.querySelector("#titleOfTodo").value = todo.title;
+    editTodoDialogElement.querySelector("#dueDateOfTodo").value = todo.dueDate
+    editTodoDialogElement.querySelector("#descriptionOfTodo").value = todo.description
+    editTodoDialogElement.querySelector(`option[value='${todo.priority}']`).selected = "selected"
+    editTodoDialogElement.dataset.projectName = projectName
+    editTodoDialogElement.dataset.todoToBeEditedId = todo.id
+    const dueDateInput = editTodoDialogElement.querySelector("p #dueDateOfTodo")
+    dueDateInput.min = format(new Date(), 'yyyy-MM-dd')
+    dueDateInput.value = viewATodo(projectName, todo.id).dueDate
 }

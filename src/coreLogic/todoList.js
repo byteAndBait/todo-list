@@ -75,8 +75,12 @@ const createTodo = (details, projectName) => {
 
 const EditATodo = (projectName, id, dataName, modification) => {
     syncLocal()
-
+    
     const currentTodo = _getATodo(projectName, id)
+console.log(`From EditATodo:
+id: ${id}
+projectName: ${projectName}
+dataName: ${dataName}`)
     currentTodo.edit(dataName, modification)
     saveToLocal(Projects)
 }
