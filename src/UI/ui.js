@@ -60,10 +60,11 @@ function updateMainContent() {
 function mainContentElementEventsHandler() {
     mainContentElement.addEventListener("click", (e) => {
         const element = e.target
-        const projectName = element.dataset.projectName;
+        const projectName = element.closest(".todo").dataset.projectName;
+        console.log(projectName)
 
         if (element.classList.contains("todoCompletion")) {
-            const todo = viewATodo(projectName, element.dataset.todoId)
+            const todo = viewATodo(projectName, element.closest(".todo").id)
             if (element.checked) {
                 EditATodo(projectName, todo.id, "completed", true)
                 document.querySelector(`.todo[id='${todo.id}']`).classList.add("todoCompleted")
@@ -74,7 +75,7 @@ function mainContentElementEventsHandler() {
             return;
         }
         if (element.classList.contains("todoRemove")) {
-            const todo = viewATodo(projectName, element.dataset.todoId)
+            const todo = viewATodo(projectName, element.closest(".todo").id)
             removeATodo(projectName, todo.id)
             updateMainContent()
 
@@ -82,8 +83,9 @@ function mainContentElementEventsHandler() {
         if (element.classList.contains("todoEdit")) {
             console.log(`From Events
 projectName: ${projectName}
-ID: ${element.dataset.todoId}`)
-            const todo = viewATodo(projectName, element.dataset.todoId)
+ID: ${element.closest(".todo").id}`)
+            const todo = viewATodo(projectName, element.closest(".todo").id)
+            console.log(todo)
             editTodoDialogPopulator(projectName, todo)
             editTodoDialogElement.showModal()
         }
@@ -181,8 +183,6 @@ function showContentOfAProject(projectName) {
         const todoCompletion = document.createElement("input")
         todoCompletion.classList.add("todoCompletion")
         todoCompletion.type = "checkbox"
-        todoCompletion.dataset.todoId = todo.id
-        todoCompletion.dataset.projectName = projectName
 
         if (todo.completed) {
             todoCompletion.checked = "checked"
@@ -215,14 +215,10 @@ function showContentOfAProject(projectName) {
         const removeButton = document.createElement("button")
         removeButton.textContent = "remove"
         removeButton.classList.add("todoRemove")
-        removeButton.dataset.todoId = todo.id
-        removeButton.dataset.projectName = projectName
 
         const editButton = document.createElement("button")
         editButton.textContent = "edit"
         editButton.classList.add("todoEdit")
-        editButton.dataset.todoId = todo.id
-        editButton.dataset.projectName = projectName
         utilities.append(removeButton, editButton)
 
         details.append(todoDescription, utilities)
