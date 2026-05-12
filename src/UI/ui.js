@@ -282,11 +282,16 @@ function createProjectButtonHandler() {
 
     button.addEventListener("click", () => {
         if (input.value) {
-            createProject(input.value)
-            input.value = ""
-            Projects = viewAllProjects()
-            createTodoDialogPopulator()
-            updateProjectsList()
+            try {
+                createProject(input.value)
+                input.value = ""
+                Projects = viewAllProjects()
+                createTodoDialogPopulator()
+                updateProjectsList()
+            } catch (error) {
+                console.log("Project Already Exists")
+                input.value = ""
+            }
 
         }
     })

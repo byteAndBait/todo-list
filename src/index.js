@@ -24,5 +24,5 @@ const dumbData = () => {
 
 }
 
-createProject("Uncategorized")
+
 setupUI()

@@ -41,8 +41,9 @@ class Project {
 
 const createProject = (name) => {
     syncLocal()
+    console.log(name)
     if (Object.hasOwn(Projects, name)) {
-        return "Project Already Exists!"
+        throw new Error("Project Already Exists!")
     }
     const projectToBeCreated = new Project(name)
     Projects[name] = Object.assign(
@@ -75,9 +76,9 @@ const createTodo = (details, projectName) => {
 
 const EditATodo = (projectName, id, dataName, modification) => {
     syncLocal()
-    
+
     const currentTodo = _getATodo(projectName, id)
-console.log(`From EditATodo:
+    console.log(`From EditATodo:
 id: ${id}
 projectName: ${projectName}
 dataName: ${dataName}`)
@@ -137,5 +138,11 @@ const viewAllProjects = () => {
     )
 }
 
-
+const projectToBeCreated = new Project("Uncategorized")
+Projects["Uncategorized"] = Object.assign(
+    projectToBeCreated,
+    projectAddTodo(projectToBeCreated),
+    projectRemoveTodo(projectToBeCreated)
+)
+saveToLocal(Projects)
 export { clearLocal, createTodo, createProject, EditATodo, viewATodo, removeATodo, viewAProject, viewAllProjects, removeProject }
