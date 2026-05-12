@@ -14,8 +14,6 @@ body {
   display: flex;
 }
 
-
-
 button {
   color: white;
   background-color: black;
@@ -163,21 +161,20 @@ main.content {
   align-items: center;
   justify-content: space-between;
 }
-.todo:hover .details{
+.todo:hover .details {
   height: 5rem;
   overflow: scroll;
-  
 }
-.todo .details{
+.todo .details {
   height: 0;
   overflow: clip;
   transition: 300ms ease;
   position: relative;
 }
-.todo .details:hover .utilities{
+.todo .details:hover .utilities {
   opacity: 1;
 }
-.todo .details .utilities{
+.todo .details .utilities {
   opacity: 0;
   position: sticky;
   transition: inherit;
@@ -186,4 +183,15 @@ main.content {
   display: flex;
   width: max-content;
   gap: 5px;
+}
+.todo .utilities button {
+  position: relative;
+  padding: 12px;
+}
+.todo .utilities button::before {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 1rem;
 }

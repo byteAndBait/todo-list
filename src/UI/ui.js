@@ -20,8 +20,6 @@ export function setupUI() {
     mainContentElementEventsHandler()
     updateMainContent()
 }
-
-
 function projectsListEventsHandler() {
     projectsList.addEventListener("click", (e) => {
         if (e.target.classList.contains("projectName")) {
@@ -213,11 +211,11 @@ function showContentOfAProject(projectName) {
         const utilities = document.createElement("div")
         utilities.classList.add("utilities")
         const removeButton = document.createElement("button")
-        removeButton.textContent = "remove"
+        removeButton.className = "fa-solid fa-trash"
         removeButton.classList.add("todoRemove")
 
         const editButton = document.createElement("button")
-        editButton.textContent = "edit"
+        editButton.className = "fa-solid fa-pen-to-square"
         editButton.classList.add("todoEdit")
         utilities.append(removeButton, editButton)
 
