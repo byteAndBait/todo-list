@@ -1,15 +1,14 @@
-import { todoEdit, projectAddTodo, projectRemoveTodo } from "./compositors.js"
-
-export const saveToLocal = (Projects) => {
-    localStorage.setItem("projects", JSON.stringify(Projects))
+import { Todo, Project } from "./entities.js"
+export function saveToLocal(Projects) {
+    localStorage.setItem(localProjectsKeyword, JSON.stringify(Projects))
 }
 
-export const _clearLocal = () => {
-    localStorage.clear("projects")
+export function _clearLocal() {
+    localStorage.clear(localProjectsKeyword)
 }
-export const getFromLocal = () => {
-    if (localStorage.getItem("projects") == undefined) {
-        localStorage.setItem("projects", JSON.stringify({}))
+export function getFromLocal() {
+    if (localStorage.getItem(localProjectsKeyword) == undefined) {
+        localStorage.setItem(localProjectsKeyword, JSON.stringify({}))
         return JSON.parse(localStorage.getItem("projects"))
     } else {
         let localProjects = JSON.parse(localStorage.getItem("projects"))

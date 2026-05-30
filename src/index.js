@@ -1,6 +1,10 @@
-import { setupUI } from "./UI/ui.js"
-import { clearLocal, createTodo, EditATodo, viewATodo, removeATodo, createProject, removeProject, viewAProject, viewAllProjects } from "./coreLogic/todoList.js"
+import "./css/main.css"
+import "./css/normalize.css"
 
+import { parseISO } from "date-fns"
+// import { setupUI } from "./ui.js"z
+// import { clearLocal, createTodo, EditATodo, viewATodo, removeATodo, createProject, removeProject, viewAProject, viewAllProjects } from "./todoList.js"
+import { todoList } from "./todoList.js"
 const myTodoDetails = {
     title: "Programming",
     description: "Most wonderful thing ever",
@@ -15,14 +19,14 @@ const myOtherTodoDetails = {
     completed: true
 }
 
-const dumbData = () => {
-    createTodo(myTodoDetails)
-    createProject("Studying")
-    createTodo(myOtherTodoDetails, "Studying")
-
-    EditATodo("default", myTodoDetails.title, "description", "It's actually pretty challenging")
-
+function dumbData() {
+    todoList.createProject("default")
+    let todo = todoList.getProject("default").addTodo(myTodoDetails)
+    todo.editData(myOtherTodoDetails)
+    console.log(todo)
 }
 
 
-setupUI()
+dumbData()
+
+// TODO : Refactor LocalStorage

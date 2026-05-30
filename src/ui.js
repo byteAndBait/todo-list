@@ -1,6 +1,4 @@
-import "../css/main.css"
-import "../css/normalize.css"
-import { createTodo, EditATodo, viewATodo, removeATodo, createProject, removeProject, viewAllProjects } from "../coreLogic/todoList.js"
+import { createTodo, EditATodo, viewATodo, removeATodo, createProject, removeProject, viewAllProjects } from "./todoList.js"
 import { format, formatDistanceToNow } from "date-fns"
 const projectsList = document.querySelector("nav.sideBar .projectsList")
 const mainContentElement = document.querySelector("main.content")
@@ -58,9 +56,12 @@ function updateMainContent() {
 function mainContentElementEventsHandler() {
     mainContentElement.addEventListener("click", (e) => {
         const element = e.target
-        const projectName = element.closest(".todo").dataset.projectName;
-        console.log(projectName)
-
+        let projectName;
+        try {
+            projectName = element.closest(".todo").dataset.projectName;
+        } catch (error) {
+            return;
+        }
         if (element.classList.contains("todoCompletion")) {
             const todo = viewATodo(projectName, element.closest(".todo").id)
             if (element.checked) {
