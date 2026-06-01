@@ -1,10 +1,8 @@
 import "./css/main.css"
 import "./css/normalize.css"
 
-import { parseISO } from "date-fns"
-// import { setupUI } from "./ui.js"z
-// import { clearLocal, createTodo, EditATodo, viewATodo, removeATodo, createProject, removeProject, viewAProject, viewAllProjects } from "./todoList.js"
 import { todoList } from "./todoList.js"
+import { Project } from "./entities.js"
 const myTodoDetails = {
     title: "Programming",
     description: "Most wonderful thing ever",
@@ -19,14 +17,6 @@ const myOtherTodoDetails = {
     completed: true
 }
 
-function dumbData() {
-    todoList.createProject("default")
-    let todo = todoList.getProject("default").addTodo(myTodoDetails)
-    todo.editData(myOtherTodoDetails)
-    console.log(todo)
-}
-
-
-dumbData()
+todoList.init()
 
 // TODO : Refactor LocalStorage

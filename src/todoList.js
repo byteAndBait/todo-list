@@ -1,34 +1,40 @@
 import { Todo, Project } from "./entities.js"
-// import { getFromLocal, saveToLocal, _clearLocal } from "./localStorageLogic.js"
-
-// import { isMatch } from "date-fns";
+import { parseISO } from "date-fns"
+import { getFromLocal, saveToLocal, clearLocal } from "./localStorageLogic.js"
 export const todoList = {
-
-
-    // syncLocal: () => {
-    //     Projects = getFromLocal(Projects)
-    // },
-    // clearLocal: () => {
-    //     _clearLocal()
-    //     syncLocal()
-    // },
     Projects: [],
-
-    // functions That modify the Projects object
-
+    loadProjectsFromLocal: function () {
+        this.Projects = getFromLocal()
+    },
+    saveProjectsToLocal: function () { saveToLocal(this.Projects) },
+    init: function () {
+        if (getFromLocal() == undefined) {
+            this.Projects = []
+            this.saveProjectsToLocal()
+        }
+        this.loadProjectsFromLocal()
+        if (this.Projects.find((project) => project.name == "default") === undefined) {
+            this.createProject("default")
+            this.saveProjectsToLocal()
+        }
+    },
     createProject(name) {
-        if (this.Projects.find((project) => { project.name === name })) {
+        this.loadProjectsFromLocal()
+        if (this.Projects.find((project) => project.name == name)) {
             console.log(this.Projects)
             console.log(name)
             throw new Error("Project Already Exists")
         }
         this.Projects.push(new Project(name))
+        this.saveProjectsToLocal()
     },
     removeProject(name) {
+        this.loadProjectsFromLocal()
         this.Projects.filter((project) => { project.name === name })
+        this.saveProjectsToLocal()
     },
-
     getProject(name) {
+        this.loadProjectsFromLocal()
         if (!(this.Projects.find((project) => project.name === name))) {
             console.log(this.Projects)
             console.log(name)
@@ -37,8 +43,8 @@ export const todoList = {
         }
         return this.Projects.find((project) => project.name === name)
     },
-
     getTodo(projectName, id) {
+        loadFromLocal()
         if (!(this.Projects.find((project) => project.name === projectName))) {
             console.log(this.Projects)
             console.log(name)
@@ -52,6 +58,7 @@ export const todoList = {
         }
         return project.todos.find((todo) => todo.id === id)
     },
+    clearLocal
 }
 
 // const projectToBeCreated = new Project("Uncategorized")
@@ -60,5 +67,4 @@ export const todoList = {
 //     projectAddTodo(projectToBeCreated),
 //     projectRemoveTodo(projectToBeCreated)
 // )
-// saveToLocal(Projects)
 // export { clearLocal, createTodo, createProject, EditATodo, viewATodo, removeATodo, viewAProject, viewAllProjects, removeProject }

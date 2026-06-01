@@ -1,33 +1,24 @@
 import { Todo, Project } from "./entities.js"
-export function saveToLocal(Projects) {
-    localStorage.setItem(localProjectsKeyword, JSON.stringify(Projects))
-}
-
-export function _clearLocal() {
-    localStorage.clear(localProjectsKeyword)
+const localProjectsKeyword = "projects"
+export function saveToLocal(projects) {
+    localStorage.setItem(localProjectsKeyword,
+        JSON.stringify(projects))
 }
 export function getFromLocal() {
-    if (localStorage.getItem(localProjectsKeyword) == undefined) {
-        localStorage.setItem(localProjectsKeyword, JSON.stringify({}))
-        return JSON.parse(localStorage.getItem("projects"))
-    } else {
-        let localProjects = JSON.parse(localStorage.getItem("projects"))
-        // Bring Back methods to the objects after parsing JSON
-        for (let project in localProjects) {
-            project = localProjects[project]
-            project = Object.assign(
-                project,
-                projectAddTodo(project),
-                projectRemoveTodo(project)
-            )
-            for (let todo in project.todos) {
-                todo = project.todos[todo]
-                todo = Object.assign(
-                    todo,
-                    todoEdit(todo)
-                )
-            }
-        }
+    if (localStorage.getItem(localProjectsKeyword)) {
+        let localProjects = JSON.parse(localStorage.getItem(localProjectsKeyword))
+        localProjects = localProjects.map((project) => {
+            project.todos = project.todos.map((todo) => {
+                return Object.setPrototypeOf(todo, Object.getPrototypeOf(new Todo(todo)))
+            })
+            return Object.setPrototypeOf(project, Object.getPrototypeOf(new Project(project.name)))
+
+        })
         return localProjects
     }
+    return undefined
+}
+
+export function clearLocal() {
+    localStorage.clear(localProjectsKeyword)
 }

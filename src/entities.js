@@ -1,3 +1,4 @@
+import { todoList } from "./todoList.js"
 export class Todo {
     constructor(details) {
         this.id = crypto.randomUUID()
@@ -9,6 +10,7 @@ export class Todo {
     }
     toggleComplete() {
         this.completed = this.completed ? false : true;
+        todoList.saveProjectsToLocal()
     }
     editData(details) {
         this.title = details.title
@@ -16,6 +18,7 @@ export class Todo {
         this.priority = details.priority
         this.completed = details.completed
         this.dueDate = details.dueDate
+        todoList.saveProjectsToLocal()
     }
 }
 export class Project {
@@ -26,9 +29,12 @@ export class Project {
     addTodo(details) {
         let todo = new Todo(details)
         this.todos.push(todo)
+        todoList.saveProjectsToLocal()
         return todo
     }
     removeTodo(id) {
+        todoList.syncLocal()
         this.todos = this.todos.filter((todo) => { !(todo.id === id) })
+        todoList.saveProjectsToLocal()
     }
 }
