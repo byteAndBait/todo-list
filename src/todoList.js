@@ -1,5 +1,4 @@
 import { Todo, Project } from "./entities.js"
-import { parseISO } from "date-fns"
 import { getFromLocal, saveToLocal, clearLocal } from "./localStorageLogic.js"
 export const todoList = {
     Projects: [],
@@ -13,8 +12,8 @@ export const todoList = {
             this.saveProjectsToLocal()
         }
         this.loadProjectsFromLocal()
-        if (this.Projects.find((project) => project.name == "default") === undefined) {
-            this.createProject("default")
+        if (this.Projects.find((project) => project.name == "Uncategorized") === undefined) {
+            this.createProject("Uncategorized")
             this.saveProjectsToLocal()
         }
     },
@@ -30,7 +29,7 @@ export const todoList = {
     },
     removeProject(name) {
         this.loadProjectsFromLocal()
-        this.Projects.filter((project) => { project.name === name })
+        this.Projects = this.Projects.filter((project) =>  project.name != name)
         this.saveProjectsToLocal()
     },
     getProject(name) {
@@ -44,7 +43,7 @@ export const todoList = {
         return this.Projects.find((project) => project.name === name)
     },
     getTodo(projectName, id) {
-        loadFromLocal()
+        this.loadProjectsFromLocal()
         if (!(this.Projects.find((project) => project.name === projectName))) {
             console.log(this.Projects)
             console.log(name)

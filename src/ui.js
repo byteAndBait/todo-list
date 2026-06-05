@@ -1,120 +1,123 @@
-import { createTodo, EditATodo, viewATodo, removeATodo, createProject, removeProject, viewAllProjects } from "./todoList.js"
-import { format, formatDistanceToNow } from "date-fns"
+import { todoList } from "./todoList.js"
+import { parseISO, formatDistanceToNow, format } from "date-fns"
 const projectsList = document.querySelector("nav.sideBar .projectsList")
 const mainContentElement = document.querySelector("main.content")
-const createTodoDialogElement = document.querySelector("#createTodoDialog")
-const editTodoDialogElement = document.querySelector("#editTodoDialog")
+const todoDialog = document.querySelector("#createTodoDialog")
 const createProjectInput = document.querySelector(".createProjectInput")
-const defaultProjectName = "All Todos"
-let Projects = viewAllProjects()
-
+const allTodosProjectName = "All Todos"
+let todoEditable = false;
+let todoEditableID;
+let todoEditableProjectName;
 export function setupUI() {
     updateProjectsList()
-    createTodoDialogPopulator()
-    createTodoDialogEventsHandler()
-    editTodoDialogEventsHandler()
+    todoDialogInit()
+    todoDialogEventsHandler()
     createProjectButtonHandler()
     projectsListEventsHandler()
     mainContentElementEventsHandler()
-    updateMainContent()
+    updateSpecialTiles()
 }
 function projectsListEventsHandler() {
     projectsList.addEventListener("click", (e) => {
-        if (e.target.classList.contains("projectName")) {
+        let element = e.target
+        if (element.classList.contains("createProjectButton")) {
+            let input = document.getElementById("projectName")
+            input.setCustomValidity("")
+            if (input.value.length === 0) {
+                input.setCustomValidity("Project name can't be empty")
+                return
+            }
 
-            showContentOfAProject(e.target.parentElement.dataset.projectName)
-
-            projectsList.childNodes.forEach((child) => {
-                child.classList.remove("active")
-            })
-            e.target.parentElement.classList.toggle("active")
+            todoList.createProject(input.value)
+            return
         }
-        if (e.target.classList.contains("removeProjectButton")) {
-            removeProject(e.target.parentElement.dataset.projectName)
-            createTodoDialogPopulator()
+        if (element.classList.contains("projectName")) {
+            try {
+                projectsList.querySelector(".projectTile.active").classList.remove("active")
+            } catch (e) { }
+            renderProjectTodos(element.closest(".projectTile").dataset.projectName)
+            element.closest(".projectTile").classList.add("active")
+            return
+        }
+        if(element.classList.contains("removeProjectButton")){
+            todoList.removeProject(element.closest(".projectTile").dataset.projectName)
+
             updateProjectsList()
+            updateSpecialTiles()
+            return
         }
     })
 }
 
 
-function updateMainContent() {
+function updateSpecialTiles() {
     if (document.querySelector(".projectTile.active")) {
         document.querySelector(".projectTile.active .projectName").click();
         return
     }
-    if (document.querySelector(`.projectTile[data-project-name='${defaultProjectName}'] .projectName`)) {
-
-        document.querySelector(`.projectTile[data-project-name='${defaultProjectName}'] .projectName`).click()
+    if (document.querySelector(`.projectTile[data-project-name='${allTodosProjectName}'] .projectName`)) {
+        document.querySelector(`.projectTile[data-project-name='${allTodosProjectName}'] .projectName`).click()
         return
     }
 }
-
-
 
 
 function mainContentElementEventsHandler() {
     mainContentElement.addEventListener("click", (e) => {
         const element = e.target
         let projectName;
+        let todo;
         try {
             projectName = element.closest(".todo").dataset.projectName;
+            todo = todoList.getTodo(projectName, element.closest(".todo").id)
         } catch (error) {
             return;
         }
         if (element.classList.contains("todoCompletion")) {
-            const todo = viewATodo(projectName, element.closest(".todo").id)
-            if (element.checked) {
-                EditATodo(projectName, todo.id, "completed", true)
+            todo.toggleComplete()
+            if(todo.completed){
                 document.querySelector(`.todo[id='${todo.id}']`).classList.add("todoCompleted")
-            } else if (element.checked === false) {
-                EditATodo(projectName, todo.id, "completed", false)
+                return
+            }
+            if(!todo.completed){
                 document.querySelector(`.todo[id='${todo.id}']`).classList.remove("todoCompleted")
+                return
             }
             return;
         }
         if (element.classList.contains("todoRemove")) {
-            const todo = viewATodo(projectName, element.closest(".todo").id)
-            removeATodo(projectName, todo.id)
-            updateMainContent()
-
+            try {
+                todoList.getProject(projectName).removeTodo(todo.id)
+            } catch (e) {
+                return
+            }
+            updateSpecialTiles()
         }
         if (element.classList.contains("todoEdit")) {
-            console.log(`From Events
-projectName: ${projectName}
-ID: ${element.closest(".todo").id}`)
-            const todo = viewATodo(projectName, element.closest(".todo").id)
-            console.log(todo)
+            todoEditable = true
+            todoEditableID = todo.id
+            todoEditableProjectName = projectName
             editTodoDialogPopulator(projectName, todo)
-            editTodoDialogElement.showModal()
+            todoDialog.showModal()
         }
     })
 }
 
 function updateProjectsList() {
-    Projects = viewAllProjects()
     projectsList.textContent = ''
-    projectsList.appendChild(createProjectTile(defaultProjectName))
-
+    projectsList.appendChild(createProjectTile(allTodosProjectName))
     const projectNames = [];
 
-    for (let i in Projects) {
-        const project = Projects[i]
+    todoList.Projects.map((project) => {
         projectNames.push(project.name)
-    }
+    })
 
-
-    for (let i in projectNames) {
-        const projectName = projectNames[i]
+    projectNames.map((projectName) => {
         if (!(projectName === "Uncategorized")) { // To Hide the Uncategorized projectTile
             const projectTileElement = createProjectTile(projectName)
             projectsList.appendChild(projectTileElement)
         }
-    }
-
-
-
-
+    })
 
     function createProjectTile(projectName) {
         const projectTile = document.createElement("div")
@@ -126,40 +129,35 @@ function updateProjectsList() {
         projectNameElement.textContent = projectName
         projectTile.appendChild(projectNameElement)
 
-        if (!(projectName === defaultProjectName)) { // No remove button on All Todos Project
+        if (!(projectName === allTodosProjectName)) { // No remove button on All Todos Project
             const removeButton = document.createElement("button")
             removeButton.textContent = "x"
             removeButton.classList.add("removeProjectButton")
             projectTile.appendChild(removeButton)
         }
-
         return projectTile
     }
-    updateMainContent()
+    updateSpecialTiles()
 
 }
 
 
-function showContentOfAProject(projectName) {
-    Projects = viewAllProjects()
+function renderProjectTodos(projectName) {
     mainContentElement.textContent = ""
-    let todos;
-    if (projectName === defaultProjectName) {
-        for (let i in Projects) {
-            const project = Projects[i];
-            for (let j in project.todos) {
-                mainContentElement.appendChild(createTodoElement(project.todos[j], project.name))
-            }
-        }
+    if(projectName === allTodosProjectName){
+        todoList.Projects.map((project) => {
+            project.todos.map((todo) => {
+                mainContentElement.appendChild(createTodoElement(todo, project.name))
+            })
+        })
         return
-    } else {
-        todos = Projects[projectName].todos
     }
-
-
-    for (let i in todos) {
-        mainContentElement.appendChild(createTodoElement(todos[i], projectName))
-    }
+    
+    let todos;
+    todos = todoList.getProject(projectName).todos
+    todos.map((todo) => {
+        mainContentElement.appendChild(createTodoElement(todo, projectName))
+    })
 
     function createTodoElement(todo, projectName) {
         const todoElement = document.createElement("div")
@@ -173,7 +171,6 @@ function showContentOfAProject(projectName) {
         const todoTitle = document.createElement("h1")
         todoTitle.classList.add("todoTitle")
         todoTitle.textContent = todo.title
-
 
         const todoPriority = document.createElement("div")
         todoPriority.classList.add("todoPriority")
@@ -190,27 +187,26 @@ function showContentOfAProject(projectName) {
         const todoDueDate = document.createElement("div")
         todoDueDate.classList.add("todoDueDate")
         try {
-            todoDueDate.textContent = formatDistanceToNow(todo.dueDate)
+            todoDueDate.textContent = formatDistanceToNow(parseISO(todo.dueDate))
         } catch (error) {
             todoDueDate.textContent = ""
         }
         todoMainTitle.append(todoCompletion, todoTitle, todoDueDate, todoPriority)
 
+
         // Expanded Details
         const details = document.createElement("div")
         details.classList.add("details")
-
 
         const todoDescription = document.createElement("p")
         todoDescription.classList.add("todoDescription")
         todoDescription.textContent = todo.description
 
 
-
-
         // Utilities
         const utilities = document.createElement("div")
         utilities.classList.add("utilities")
+
         const removeButton = document.createElement("button")
         removeButton.className = "fa-solid fa-trash"
         removeButton.classList.add("todoRemove")
@@ -218,9 +214,12 @@ function showContentOfAProject(projectName) {
         const editButton = document.createElement("button")
         editButton.className = "fa-solid fa-pen-to-square"
         editButton.classList.add("todoEdit")
+
         utilities.append(removeButton, editButton)
 
         details.append(todoDescription, utilities)
+
+
         todoElement.append(todoMainTitle, details)
         return todoElement
     }
@@ -228,49 +227,76 @@ function showContentOfAProject(projectName) {
 
 // Todo Creation
 
-function createTodoDialogPopulator() {
-    Projects = viewAllProjects()
-    const projectsSelectMenu = createTodoDialogElement.querySelector("#projectsSelectMenu")
+function todoDialogInit() {
+    const projectsSelectMenu = todoDialog.querySelector("#projectsSelectMenu")
     projectsSelectMenu.textContent = ""
 
-    for (let i in Projects) {
-        const project = Projects[i]
-        projectsSelectMenu.appendChild(addOption(project.name))
-    }
-
+    todoList.Projects.map((project) => {
+        projectsSelectMenu.append(addOption(project.name))
+    })
     function addOption(value) {
         const option = document.createElement("option")
         option.value = value;
         option.textContent = value;
         return option
     }
-    const dueDateInput = createTodoDialogElement.querySelector("p #dueDateOfTodo")
+    const dueDateInput = todoDialog.querySelector("div #dueDateOfTodo")
     dueDateInput.min = format(new Date(), 'yyyy-MM-dd')
+    return
 
 }
 
-function createTodoDialogEventsHandler() {
-    const form = createTodoDialogElement.querySelector("form")
-    const closeButton = createTodoDialogElement.querySelector("button")
+function todoDialogEventsHandler() {
+    const form = todoDialog.querySelector("form")
+    const closeButton = todoDialog.querySelector("button.closeButton")
+    closeButton.addEventListener("click", () => {
+        console.log("bruh we are closing")
+        todoDialog.close()
+    })
+
     const createTodoButton = document.getElementById("createTodoButton")
     createTodoButton.addEventListener("click", () => {
-        createTodoDialogElement.showModal("")
+        todoDialog.showModal("")
+        
+    todoDialog.querySelector("#projectsSelectMenu").closest("div").classList.remove("hidden")
+    todoDialog.querySelector("input[type='submit']").value = "Create Your Todo"
+    todoEditable = false;
     })
-    closeButton.addEventListener("click", () => {
-        createTodoDialogElement.close()
-    })
+
+
     form.addEventListener("submit", () => {
         event.preventDefault()
-        const projectName = form.querySelector("p select#projectsSelectMenu").value
-        const details = {
-            title: form.querySelector("p input#titleOfTodo").value,
-            description: form.querySelector("p textarea#descriptionOfTodo").value,
-            dueDate: form.querySelector("p input#dueDateOfTodo").value,
-            priority: form.querySelector("p select#prioritySelectMenu").value
+        console.log(event.target)
+        if (!todoEditable) {
+            const projectName = form.querySelector("select#projectsSelectMenu").value
+            const details = {
+                title: form.querySelector("input#titleOfTodo").value,
+                description: form.querySelector("textarea#descriptionOfTodo").value,
+                dueDate: form.querySelector("input#dueDateOfTodo").value,
+                priority: form.querySelector("select#prioritySelectMenu").value
+            }
+            todoList.getProject(projectName).addTodo(details)
+            todoDialog.close()
+            updateSpecialTiles()
+            return
         }
-        createTodo(details, projectName)
-        createTodoDialogElement.close()
-        updateMainContent()
+
+        if (todoEditable) {
+
+            const modifiedDetails = {
+                title: todoDialog.querySelector("#titleOfTodo").value,
+                dueDate: todoDialog.querySelector("#dueDateOfTodo").value,
+                description: todoDialog.querySelector("#descriptionOfTodo").value,
+                priority: todoDialog.querySelector("select#prioritySelectMenu").value
+            }
+            todoList.getTodo(todoEditableProjectName, todoEditableID).editData(modifiedDetails)
+            todoDialog.close()
+            updateSpecialTiles()
+
+            
+            todoEditable = false;
+            return
+        }
     })
 }
 
@@ -284,10 +310,9 @@ function createProjectButtonHandler() {
     button.addEventListener("click", () => {
         if (input.value) {
             try {
-                createProject(input.value)
+                todoList.createProject(input.value)
                 input.value = ""
-                Projects = viewAllProjects()
-                createTodoDialogPopulator()
+                todoDialogInit()
                 updateProjectsList()
             } catch (error) {
                 console.log("Project Already Exists")
@@ -296,43 +321,20 @@ function createProjectButtonHandler() {
 
         }
     })
-
 }
 
-// Editing A todo
-function editTodoDialogEventsHandler() {
 
-    const form = editTodoDialogElement.querySelector("form")
-
-    form.addEventListener("submit", () => {
-        event.preventDefault()
-        const modifiedDetails = {
-            title: editTodoDialogElement.querySelector("#titleOfTodo").value,
-            dueDate: editTodoDialogElement.querySelector("#dueDateOfTodo").value,
-            description: editTodoDialogElement.querySelector("#descriptionOfTodo").value,
-            priority: editTodoDialogElement.querySelector("p select#prioritySelectMenu").value
-        }
-        for (let dataName in modifiedDetails) {
-            EditATodo(editTodoDialogElement.dataset.projectName, editTodoDialogElement.dataset.todoToBeEditedId, dataName, modifiedDetails[dataName])
-        }
-        editTodoDialogElement.close()
-        updateMainContent()
-
-    })
-    const closeButton = editTodoDialogElement.querySelector("button.closeButton")
-    closeButton.addEventListener("click", () => {
-        editTodoDialogElement.close()
-    })
-}
 
 function editTodoDialogPopulator(projectName, todo) {
-    editTodoDialogElement.querySelector("#titleOfTodo").value = todo.title;
-    editTodoDialogElement.querySelector("#dueDateOfTodo").value = todo.dueDate
-    editTodoDialogElement.querySelector("#descriptionOfTodo").value = todo.description
-    editTodoDialogElement.querySelector(`option[value='${todo.priority}']`).selected = "selected"
-    editTodoDialogElement.dataset.projectName = projectName
-    editTodoDialogElement.dataset.todoToBeEditedId = todo.id
-    const dueDateInput = editTodoDialogElement.querySelector("p #dueDateOfTodo")
+    todoDialog.querySelector("#titleOfTodo").value = todo.title;
+    todoDialog.querySelector("#dueDateOfTodo").value = todo.dueDate
+    todoDialog.querySelector("#descriptionOfTodo").value = todo.description
+    todoDialog.querySelector(`option[value='${todo.priority}']`).selected = "selected"
+    todoDialog.dataset.projectName = projectName
+    todoDialog.dataset.todoToBeEditedId = todo.id
+    const dueDateInput = todoDialog.querySelector("#dueDateOfTodo")
     dueDateInput.min = format(new Date(), 'yyyy-MM-dd')
-    dueDateInput.value = viewATodo(projectName, todo.id).dueDate
+    dueDateInput.value = todo.dueDate
+    todoDialog.querySelector("#projectsSelectMenu").closest("div").classList.add("hidden")
+    todoDialog.querySelector("input[type='submit']").value = "Complete Editing"
 }

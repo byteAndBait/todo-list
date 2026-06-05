@@ -33,22 +33,20 @@
 
     <button id="createTodoButton">+</button>
     <dialog id="createTodoDialog">
-        <button class="closeButton">x</button>
-
         <form>
-            <p>
+            <div>
                 <label for="titleOfTodo">The Title of your todo</label>
-                <input type="text" id="titleOfTodo" name="titleOfTodo" value="todo" required>
-            </p>
-            <p>
+                <input type="text" id="titleOfTodo" name="titleOfTodo" value="myTodo" required>
+            </div>
+            <div>
                 <label for="descriptionOfTodo">The description of your todo</label>
                 <textarea id="descriptionOfTodo" name="descriptionOfTodo"></textarea>
-            </p>
-            <p>
+            </div>
+            <div>
                 <label for="dueDateOfTodo">Due Date:</label>
                 <input type="date" id="dueDateOfTodo" name="dueDateOfTodo">
-            </p>
-            <p>
+            </div>
+            <div>
                 <label for="prioritySelectMenu">Priority:</label>
                 <select name="prioritySelectMenu" id="prioritySelectMenu">
                     <option value="Low">Low</option>
@@ -56,44 +54,17 @@
                     <option value="High">High</option>
                     <option value="none" selected>none</option>
                 </select>
-            </p>
-            <p>
+            </div>
+            <div>
                 <label for="projectsSelectMenu">Project:</label>
                 <select name="projectsSelectMenu" id="projectsSelectMenu" required
                     oninvalid="this.setCustomValidity('Please, Create a project to continue')">
                 </select>
-            </p>
-
-            <input type="submit" value="Create Your Todo">
-        </form>
-    </dialog>
-    <dialog id="editTodoDialog">
-        <button class="closeButton">x</button>
-
-        <form>
-            <p>
-                <label for="titleOfTodo">Edit The Title of your todo</label>
-                <input type="text" id="titleOfTodo" name="titleOfTodo" required>
-            </p>
-            <p>
-                <label for="descriptionOfTodo">Edit The description of your todo</label>
-                <textarea id="descriptionOfTodo" name="descriptionOfTodo"></textarea>
-            </p>
-            <p>
-                <label for="dueDateOfTodo">Due Date:</label>
-                <input type="date" id="dueDateOfTodo" name="dueDateOfTodo">
-            </p>
-            <p>
-                <label for="prioritySelectMenu">Priority:</label>
-                <select name="prioritySelectMenu" id="prioritySelectMenu">
-                    <option value="Low">Low</option>
-                    <option value="Medium">Medium</option>
-                    <option value="High">High</option>
-                    <option value="none" selected>none</option>
-                </select>
-            </p>
-
-            <input type="submit" value="Confirm">
+            </div>
+            <div class="buttons">
+                <button class="closeButton">Cancel</button>
+                <input type="submit" value="Create Your Todo">
+            </div>
         </form>
     </dialog>
 </body>

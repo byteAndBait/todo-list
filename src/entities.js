@@ -13,11 +13,11 @@ export class Todo {
         todoList.saveProjectsToLocal()
     }
     editData(details) {
-        this.title = details.title
+        this.title = details.title || this.title
         this.description = details.description
-        this.priority = details.priority
-        this.completed = details.completed
-        this.dueDate = details.dueDate
+        this.priority = details.priority || this.priority
+        this.completed = details.completed || this.completed
+        this.dueDate = details.dueDate || this.dueDate
         todoList.saveProjectsToLocal()
     }
 }
@@ -33,8 +33,7 @@ export class Project {
         return todo
     }
     removeTodo(id) {
-        todoList.syncLocal()
-        this.todos = this.todos.filter((todo) => { !(todo.id === id) })
+        this.todos = this.todos.filter((todo) => todo.id != id)
         todoList.saveProjectsToLocal()
     }
 }

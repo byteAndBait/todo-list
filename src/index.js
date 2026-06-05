@@ -3,6 +3,7 @@ import "./css/normalize.css"
 
 import { todoList } from "./todoList.js"
 import { Project } from "./entities.js"
+import { setupUI } from "./ui.js"
 const myTodoDetails = {
     title: "Programming",
     description: "Most wonderful thing ever",
@@ -18,5 +19,4 @@ const myOtherTodoDetails = {
 }
 
 todoList.init()
-
-// TODO : Refactor LocalStorage
+setupUI()
