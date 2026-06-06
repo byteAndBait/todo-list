@@ -32,8 +32,8 @@
     </main>
 
     <button id="createTodoButton">+</button>
-    <dialog id="createTodoDialog">
-        <form>
+    <dialog id="TodoDialog">
+        <form id="todoDialogForm">
             <div>
                 <label for="titleOfTodo">The Title of your todo</label>
                 <input type="text" id="titleOfTodo" name="titleOfTodo" value="myTodo" required>
@@ -61,11 +61,12 @@
                     oninvalid="this.setCustomValidity('Please, Create a project to continue')">
                 </select>
             </div>
-            <div class="buttons">
-                <button class="closeButton">Cancel</button>
-                <input type="submit" value="Create Your Todo">
-            </div>
+            
         </form>
+        <div class="buttons">
+            <input type="submit" value="Create Your Todo" form="todoDialogForm">
+            <button class="closeButton">Cancel</button>
+            </div>
     </dialog>
 </body>
 

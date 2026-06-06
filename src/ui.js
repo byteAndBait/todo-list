@@ -2,7 +2,7 @@ import { todoList } from "./todoList.js"
 import { parseISO, formatDistanceToNow, format } from "date-fns"
 const projectsList = document.querySelector("nav.sideBar .projectsList")
 const mainContentElement = document.querySelector("main.content")
-const todoDialog = document.querySelector("#createTodoDialog")
+const todoDialog = document.querySelector("#TodoDialog")
 const createProjectInput = document.querySelector(".createProjectInput")
 const allTodosProjectName = "All Todos"
 let todoEditable = false;
@@ -248,9 +248,8 @@ function todoDialogInit() {
 
 function todoDialogEventsHandler() {
     const form = todoDialog.querySelector("form")
-    const closeButton = todoDialog.querySelector("button.closeButton")
+    const closeButton = todoDialog.querySelector(".buttons .closeButton")
     closeButton.addEventListener("click", () => {
-        console.log("bruh we are closing")
         todoDialog.close()
     })
 
@@ -266,7 +265,6 @@ function todoDialogEventsHandler() {
 
     form.addEventListener("submit", () => {
         event.preventDefault()
-        console.log(event.target)
         if (!todoEditable) {
             const projectName = form.querySelector("select#projectsSelectMenu").value
             const details = {
